@@ -4,7 +4,7 @@ heroImage: /images/snow.jpg
 heroText: POLAR
 tagline: Arufa-Research
 actionText: Get Started →
-actionLink: /Guide/
+actionLink: /guide/
 features:
 - title: Simplicity First
   details: Minimal setup with markdown-centered project structure helps you focus on writing.
