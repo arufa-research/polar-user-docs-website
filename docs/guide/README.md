@@ -760,15 +760,76 @@ network: {
 
 #### Contract class
 
+Contract class is used to create an object which does operations related to a contract such as deploying, interacting with network. One can also list query, execute methods available for the contract using this class.
+
 **Constructor**
+
+Contract constructor requires 2 arguments, contract name and polar runtime environment. If contract `.wasm` file is not present in artifacts then this constructor will throw an error.
+
+```js
+const contract = new Contract(<contract-name>, env);
+```
+
+**parseSchema()**
+
+This method reads schema files from `artifacts/schema/` dir and fills query methods in `contract.query` object and execute methods in `contract.tx` object. This method will throw error if schema is not generated.
+
+```js
+contract.parseSchema();
+```
 
 **deploy()**
 
+Deploys the contract.
+
+```js
+const deploy_response = await contract.deploy(contract_owner);
+```
+
+Gives following response:
+
+```js
+{
+  codeId: <code-id-val>,
+  contractCodeHash: <code-hash-val>,
+  deployTimestamp: <timestamp>
+}
+```
+
 **instantiate()**
+
+Instantiate the contract.
+
+```js
+const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+```
+
+Gives following response:
+
+```js
+{
+  contractAddress: <contract-address>,
+  instantiateTimestamp: <timestamp>
+}
+```
 
 **tx methods**
 
+To list contract's execute methods, print `contract.tx`.
+
+```js
+polar> contract.tx
+{ increment: [Function (anonymous)], reset: [Function (anonymous)] }
+```
+
 **query methods**
+
+To list contract's query methods, print `contract.query`.
+
+```js
+polar> contract.query
+{ get_count: [Function (anonymous)] }
+```
 
 #### getAccountByName
 
