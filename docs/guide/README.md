@@ -330,24 +330,75 @@ To clear artifacts data, use `polar clean` and to clean artifacts for only one c
 
 ## Guides
 
+### Setup rust environment
+
+#### Installing using polar
+
+#### Installing manually
+
+
+
+
 ### Setting up a project
+
+#### Boilerplate code
+
+#### Updating name of contract
+
 
 
 
 ### Compiling your contracts
 
+#### Compile all contracts
 
+#### Compile one contract
 
-### Testing with Web3.js & Truffle
-### Deploying your contracts
 
 
 
 ### Writing scripts
 
+#### Sample script walkthrough
+
+#### Contract class
+
+**Constructor**
+
+**deploy()**
+
+**instantiate()**
+
+**tx methods**
+
+**query methods**
+
+#### getAccountByName
+
+#### createAccounts
+
+
 
 
 ### Using REPL
+
+#### Polar Runtime Environment
+
+#### Polar config
+
+
+
+
+### Testing contracts
+
+#### Rust unit tests
+
+#### Rust integration tests
+
+#### Client interaction tests
+
+#### Test scripts
+
 
 
 
