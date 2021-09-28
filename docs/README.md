@@ -7,13 +7,13 @@ actionText: Get Started →
 actionLink: /guide/
 features:
 - title: Boilerplate
-  details: Quickly create boilerplate for you smart contracts.
+  details: Quickly create boilerplate code for your smart contracts.
 - title: Compile
   details: Compile and debug the contracts.
 - title: Artifacts generation
-  details: Generate compressed compiled files and schema.
+  details: Generate compressed compiled files and schema files.
 - title: Deploy
-  details: Generate artifacts and deploy.
+  details: Generate artifacts and deploy to a network.
 - title: Interact
   details: Scripting framework for contract interactions.
 - title: Test
