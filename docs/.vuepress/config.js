@@ -1,11 +1,11 @@
 module.exports = {
-    title: 'Arufa-Research/POLAR',
+    title: 'Arufa-Research/Polar',
     description: 'Documentation',
     themeConfig: {
         displayAllHeaders: true,
         nav: [
             {text: 'Home', link: '/'},
-            {text: 'Guide', link: '/Guide/'},
+            {text: 'Guide', link: '/guide/'},
             {text: 'About', link: '/'},
         ],
         sidebar: 'auto'

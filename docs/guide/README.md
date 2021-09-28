@@ -147,8 +147,10 @@ module.exports = {
     timeout: 60000
   }
 };
-
 ```
+
+**Note** that the accounts mentioned above are just a sample, don't use them in mainnet as it can lead to capital loss.
+
 
 #### Compiling contracts
 
@@ -216,32 +218,138 @@ Copying file query_msg.json from contracts/schema to artifacts/schema/sample_pro
 Copying file state.json from contracts/schema to artifacts/schema/sample_project
 ```
 
-This command will generate compiled `.wasm` files 
+This command will generate compiled `.wasm` files in `artifacts/contracts/` dir and schema `.json` files in `artifacts/schema/` dir.
 
 #### Running user scripts
 
+User scripts are a way to define the flow of interacting with contracts on some network in form of a script. These scripts can be used to deploy a contract, query/transact with the contract.
+
+A sample script `scripts/sample-script.js` is available in the boilerplate. Contents of the script is as follows:
+
+```js
+const { Contract, getAccountByName } = require("secret-polar");
+
+async function run (runtimeEnv) {
+  const contract_owner = getAccountByName("account_0", runtimeEnv);
+  const contract = new Contract('sample-project', runtimeEnv);
+  await contract.parseSchema();
+
+  const deploy_response = await contract.deploy(contract_owner);
+  console.log(deploy_response);
+
+  const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+  console.log(contract_info);
+
+  const ex_response = await contract.tx.increment(contract_owner);
+  console.log(ex_response);
+
+  const response = await contract.query.get_count();
+  console.log(response);
+}
+
+module.exports = { default: run };
+```
+
+The script above deploys, inits contract `sample-project` using account `account_0`. It then increments the count value using transaction `tx.increment()` and finally queries count using query `query.get_count()`.
+
+For the above script to be able to run, an account with name `account_0` must be present in `polar.config.js` and contract artifacts (compiled `.wasm` and schema `.json` files) in `artifacts/` dir must be present for contract `sample-project`.
+
 #### Running tests
+
+TODO: This section will be added once testing framework is added to Polar.
 
 #### Using REPL
 
+REPL (read–eval–print loop) gives the a console to do real time interactions with the network. Open the REPL using `polar repl --network <network-name>`. Sample REPL interaction shown below as follows:
+
+```bash
+$ polar repl --network testnet
+★★★  Welcome to polar REPL ★★★
+Try typing: config
+
+polar> config
+{
+  name: 'testnet',
+  config: {
+    accounts: [ [Object], [Object] ],
+    endpoint: 'http://bootstrap.secrettestnet.io',
+    chainId: 'holodeck-2',
+    trustNode: true,
+    keyringBackend: 'test',
+    types: {}
+  }
+}
+polar> const contract_owner = polar.getAccountByName("account_0", env);
+Creating client for network: testnet
+undefined
+polar> const contract = new polar.Contract('sample-project', env);
+Creating client for network: testnet
+undefined
+polar> const deploy_response = await contract.deploy(contract_owner);
+Creating compressed .wasm file using cosmwasm/rust-optimizer:0.12.0...
+```
+
+When REPL is opened, `polar` library is already imported, use `polar.` to access classes and functions from the library. Polar Runtime Environment can be access using `env` variable and `polar.config.js` data can be accessed using `config` variable.
+
 #### Get node information
+
+Node information can be fetched using `polar node-info --network <network-name>` as follows:
+
+```bash
+$ polar node-info --network testnet
+Creating client for network: testnet
+Network: testnet
+ChainId: holodeck-2
+Block height: 4778315
+Node Info:  {
+  node_info: {
+    protocol_version: { p2p: '7', block: '10', app: '0' },
+    id: '64b03220d97e5dc21ec65bf7ee1d839afb6f7193',
+    listen_addr: 'tcp://0.0.0.0:26656',
+    network: 'holodeck-2',
+    version: '0.33.8',
+    channels: '4020212223303800',
+    moniker: 'ChainofSecretsBootstrap',
+    other: { tx_index: 'on', rpc_address: 'tcp://0.0.0.0:26657' }
+  },
+  application_version: {
+    name: 'SecretNetwork',
+    server_name: 'secretd',
+    client_name: 'secretcli',
+    version: '1.0.4-2-ge24cdfde',
+    commit: 'e24cdfde5cd3b4bdd9b6ca429aafaa552b95e2bf',
+    build_tags: 'netgo ledger hw develop',
+    go: 'go version go1.13.4 linux/amd64'
+  }
+}
+```
 
 #### Cleanup artifacts
 
-Note that the accounts mentioned above are just a sample, don't use them in mainnet as it can lead to capital loss.
+To clear artifacts data, use `polar clean` and to clean artifacts for only one contract, use `polar clean <contract-name>`.
 
 ## Guides
 
 ### Setting up a project
+
+
+
 ### Compiling your contracts
-### Testing with ethers.js & Waffle
+
+
+
 ### Testing with Web3.js & Truffle
-### Migrating from Truffle
 ### Deploying your contracts
+
+
+
 ### Writing scripts
-### Using the Hardhat console
-### Creating a task
-### Running tests with Ganache
+
+
+
+### Using REPL
+
+
 
 ## Troubleshooting
 
