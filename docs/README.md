@@ -1,18 +1,23 @@
 ---
 home: true
 heroImage: /images/snow.jpg
-heroText: POLAR
-tagline: Arufa-Research
+heroText: Polar
+tagline: Smart contracts development framework
 actionText: Get Started →
 actionLink: /guide/
 features:
-- title: Simplicity First
-  details: Minimal setup with markdown-centered project structure helps you focus on writing.
-- title: Vue-Powered
-  details: Enjoy the dev experience of Vue + webpack, use Vue components in markdown, and develop custom themes with Vue.
-- title: Performant
-  details: VuePress generates pre-rendered static HTML for each page, and runs as an SPA once a page is loaded.
+- title: Boilerplate
+  details: Quickly create boilerplate for you smart contracts.
+- title: Compile
+  details: Compile and debug the contracts.
+- title: Artifacts generation
+  details: Generate compressed compiled files and schema.
+- title: Deploy
+  details: Generate artifacts and deploy.
+- title: Interact
+  details: Scripting framework for contract interactions.
+- title: Test
+  details: Testing suite integrated.
 footer: MIT Licensed | Copyright © 2021
 ---
 
-<ToggleDarkMode/>

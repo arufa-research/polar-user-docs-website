@@ -839,7 +839,7 @@ polar> contract.query
 
 
 
-
+<!-- 
 ### Testing contracts
 
 #### Rust unit tests
@@ -859,4 +859,4 @@ polar> contract.query
 ### Common problems
 ### Error codes
 
-## API
+## API -->
