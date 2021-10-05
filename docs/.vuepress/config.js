@@ -2,6 +2,7 @@ module.exports = {
     title: 'Arufa-Research/Polar',
     description: 'Documentation',
     themeConfig: {
+        overrideTheme: 'dark',
         displayAllHeaders: true,
         nav: [
             {text: 'Home', link: '/'},
