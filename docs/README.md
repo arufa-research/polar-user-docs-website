@@ -4,7 +4,7 @@ heroImage: /images/snow.jpg
 heroText: Polar
 tagline: Smart contracts development framework
 actionText: Get Started →
-actionLink: /guide/
+actionLink: /documentation/
 features:
 - title: Boilerplate
   details: Quickly create boilerplate code for your smart contracts.
