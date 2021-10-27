@@ -124,7 +124,8 @@ const accounts = [
 module.exports = {
   networks: {
     default: {
-      endpoint: 'http://localhost:1337/'
+      endpoint: 'http://localhost:1337/',
+      accounts: accounts
     },
     development: {
       endpoint: 'tcp://0.0.0.0:26656',
