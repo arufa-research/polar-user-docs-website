@@ -15,7 +15,7 @@ docker run -it --rm \
  -p 26657:26657 -p 26656:26656 -p 1337:1337 \
  --name secretdev enigmampc/secret-network-sw-dev
 ```
-A few accounts are available with the following information that can be used for the testing purpose.
+A few accounts are available with the following information that can be used for the development and testing purpose on the localnet.
 
 {
   "name": "a",
@@ -25,49 +25,9 @@ A few accounts are available with the following information that can be used for
   "mnemonic": "tide universe inject switch average weather obvious cube wrist shaft record chat dentist wink collect hungry cycle draw ribbon course royal indoor remind address"
 }
 
+we need to copy the name , address and mnemonic info of the accounts that we get on running the docker in our polar config file. Also it should be noted that the accounts that are to be interacted with must be on the same network. In this case the account must be present on the localnet.
+
 The secretdev docker container can be stopped by CTRL+C. At this point you're running a local SecretNetwork full-node. 
-
-### Running the docker container
-
-To view and manage the secret keys open a new terminal in your project directory.
-
-```bash
-docker exec -it secretdev /bin/bash
-
-```
-The local blockchain have some keys setup . These keys are stored in the test keyring backend, which makes it easier for local development and testing.
-
-```bash
-secretcli keys list --keyring-backend test
-[
-  {
-    "name": "a",
-    "type": "local",
-    "address": "secret12alhz3va0sz9zj7wwtfvxnrpsqhj6lw2dge0zc",
-    "pubkey": "secretpub1addwnpepq2qckftgul7ex8nauluqrdc9y2080wxr0xsve7cmx3lhe777ne59wzg9053"
-  },
-  {
-    "name": "b",
-    "type": "local",
-    "address": "secret1wghzldphtc7fwp9wqvwt5myh6j0m8mymk3cc5c",
-    "pubkey": "secretpub1addwnpepq0fq9xecn783qdecpte8673kfu93x56gllk2re4kmfqj8gchpf3nvqq0058"
-  },
-  {
-    "name": "c",
-    "type": "local",
-    "address": "secret1466g2kc605eeuu569ruh2whhchsgj72kqatj9s",
-    "pubkey": "secretpub1addwnpepqw457c29cxlf23l5r2vd0frhm5fdckqxkerk0qcx94xarmjr435ugk688j4"
-  },
-  {
-    "name": "d",
-    "type": "local",
-    "address": "secret1rfft0y97u4chs4ap3ceyvfsdugkjx5l0qjfpaz",
-    "pubkey": "secretpub1addwnpepqfv9tt8n9y23fkxpr8xgeqddtrtu3mlkmmfsam9svywaz4h0qn8zznyh464"
-  }
-]
-```
-
-exit when you are done.
 
 ### Checking the node info
 
@@ -101,6 +61,15 @@ Node Info:  {
   }
 }
 ```
+
+### Compile the contract
+
+Then we need to compile the contract. This can be done by the following command.
+
+```bash
+polar compile
+```
+
 ### Running scripts on Localnet
 
 To run any script on localnet open a new terminal :
@@ -108,6 +77,3 @@ To run any script on localnet open a new terminal :
 ```bash
 polar run scripts/sample-script.js
 ```
-
-It will call the compression docker image and compress the .wasm file by using cosmwasm/rust-optimizer:0.12.0...
-This compressed .wasm file is then used to create a contract instance and deploy the contract.
