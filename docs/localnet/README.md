@@ -1,6 +1,5 @@
 ## How to start local net and use it's keys in polar
 
-
 ### Setup the Local Developer Testnet
 
 In this document you'll find information on setting up a local Secret Network developer testnet (secretdev).
