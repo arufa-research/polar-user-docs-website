@@ -424,6 +424,7 @@ polar> contract.query
 #### Checkpoints
 
 [← Documentation](/documentation/README.md)
+[→ Deployment of contract on localnet](/localnet/README.md)
 
 
 
