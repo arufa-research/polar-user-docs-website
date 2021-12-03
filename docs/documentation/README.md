@@ -329,4 +329,622 @@ Node Info:  {
 
 To clear artifacts data, use `polar clean` and to clean artifacts for only one contract, use `polar clean <contract-name>`.
 
-[→ Guide](/guide/README.md)
+
+## Guides
+
+
+### Setup rust environment
+
+Polar requires a Rust environment installed on local machine to work properly. This Rust environment can be installed in two possible ways.
+
+#### Installing using polar
+
+Use command `polar setup` to install the Rust environment using just one command.
+
+```bash
+$ polar setup
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+info: downloading installer
+
+Welcome to Rust!
+
+This will download and install the official compiler for the Rust
+programming language, and its package manager, Cargo.
+
+Rustup metadata and toolchains will be installed into the Rustup
+home directory, located at:
+
+  /home/uditgulati/.rustup
+
+This can be modified with the RUSTUP_HOME environment variable.
+
+The Cargo home directory located at:
+
+  /home/uditgulati/.cargo
+
+This can be modified with the CARGO_HOME environment variable.
+
+The cargo, rustc, rustup and other commands will be added to
+Cargo's bin directory, located at:
+
+  /home/uditgulati/.cargo/bin
+
+This path will then be added to your PATH environment variable by
+modifying the profile files located at:
+
+  /home/uditgulati/.profile
+  /home/uditgulati/.bashrc
+
+You can uninstall at any time with rustup self uninstall and
+these changes will be reverted.
+
+Current installation options:
+
+
+   default host triple: x86_64-unknown-linux-gnu
+     default toolchain: stable (default)
+               profile: default
+  modify PATH variable: yes
+...
+```
+
+#### Installing manually
+
+**Linux**
+
++ Install `rustup`.
+
+```bash
+$ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+$ export PATH="${HOME}/.cargo/bin:${PATH}"
+```
+
++ Add `wasm32-unknown-unknown` target to `rustup stable` version.
+
+```bash
+$ rustup default stable
+$ rustup target list --installed
+$ rustup target add wasm32-unknown-unknown
+```
+
++ Install `nightly` toolchain. Add `wasm32-unknown-unknown` target to `rustup nightly` version.
+
+```bash
+$ rustup install nightly
+$ rustup target add wasm32-unknown-unknown --toolchain nightly
+```
+
++ Install `build-essentials`.
+
+```bash
+$ sudo apt install build-essential
+```
+
+
+
+
+### Setting up a project
+
+Project setup can be broken down to 3 steps broadly, which are boiler plate generation, updating project name and updating `polar.config.js` file.
+
+#### Boilerplate code
+
+Use command `polar init <project-name>` to generate boilerplate code.
+
+```bash
+$ polar init yellow
+★ Welcome to polar v0.2.0
+Initializing new project in /home/uditgulati/yellow.
+
+★ Project created ★
+
+You need to install these dependencies to run the sample project:
+  npm install --save-dev chai
+
+Success! Created project at /home/uditgulati/yellow.
+Begin by typing:
+  cd yellow
+  npx polar help
+  npx polar compile
+```
+
+The generated directory will have the following initial structure:
+
+```bash
+.
+├── contracts
+│   ├── Cargo.lock
+│   ├── Cargo.toml
+│   ├── examples
+│   │   └── schema.rs
+│   ├── src
+│   │   ├── contract.rs
+│   │   ├── lib.rs
+│   │   ├── msg.rs
+│   │   └── state.rs
+│   └── tests
+│       └── integration.rs
+├── package.json
+├── polar.config.js
+├── README.md
+├── scripts
+│   └── sample-script.js
+└── test
+    └── sample-test.js
+
+6 directories, 13 files
+```
+
+The `contracts/` directory has all the rust files for the contract logic. `scripts/` directory can contain `.js` and `.ts` scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. `test/` directory can contain `.js` and `.ts` scripts to run tests for the deployed contracts.
+
+#### Updating name of contract
+
+Replace appearances of `sample-project` and `sample_project` from following files to your project name.
+
+```bash
+$ grep -r "sample-project"
+package.json:  "name": "sample-project",
+contracts/Cargo.lock:name = "sample-project"
+contracts/Cargo.toml:name = "sample-project"
+scripts/sample-script.js:  const contract = new Contract('sample-project', runtimeEnv);
+```
+
+```bash
+$ grep -r "sample_project"
+contracts/examples/schema.rs:use sample_project::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
+contracts/examples/schema.rs:use sample_project::state::State;
+```
+
+Replacing them with a project name suppose `yellow` should look like following:
+
+```bash
+$ grep -r "yellow"
+package.json:  "name": "yellow",
+contracts/Cargo.lock:name = "yellow"
+contracts/Cargo.toml:name = "yellow"
+contracts/examples/schema.rs:use yellow::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg};
+contracts/examples/schema.rs:use yellow::state::State;
+scripts/sample-script.js:  const contract = new Contract('yellow', runtimeEnv);
+```
+
+Now compiling using `polar compile` would create following structure in `artifacts/` dir:
+
+```bash
+artifacts/
+├── contracts
+│   └── yellow.wasm
+└── schema
+    └── yellow
+        ├── count_response.json
+        ├── handle_msg.json
+        ├── init_msg.json
+        ├── query_msg.json
+        └── state.json
+
+3 directories, 6 files
+```
+
+#### Polar config
+
+Polar uses config file `polar.config.js` to execute tasks for the given project. Initial contents of `polar.config.js` file are explained below:
+
+**Network config**. Has following parameters:
+
++ endpoint: Network endpoint.
++ chainId: Network chain id.
++ trustNode: Should be set to `true`.
++ keyringBackend: Alias of keyring backend to be used.
++ accounts: Array of accounts.
+
+```js
+networks: {
+  // Holodeck Testnet
+  testnet: {
+    endpoint: 'http://bootstrap.secrettestnet.io',
+    chainId: 'holodeck-2',
+    trustNode: true,
+    keyringBackend: 'test',
+    accounts: accounts,
+    types: {}
+  }
+}
+```
+
+**Accounts config**. It is an array of account objects. Each account object has following parameters:
+
++ name: Account name (alias). Does not need to match the account name anywhere else outside the project.
++ address: Account address.
++ mnemonic: Mnemonic for the account. Do not push this value to a public repository.
+
+```js
+const accounts = [
+  {
+    name: 'account_0',
+    address: 'secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk',
+    mnemonic: 'snack cable erode art lift better october drill hospital clown erase address'
+  },
+  {
+    name: 'account_1',
+    address: 'secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv',
+    mnemonic: 'sorry object nation also century glove small tired parrot avocado pulp purchase'
+  }
+];
+```
+
+**Mocha test config**. Increase/decrease the `timeout` value to tweak test framework timeout.
+
+```js
+mocha: {
+  timeout: 60000
+}
+```
+
+
+
+### Compiling your contracts
+
+#### Compile all contracts
+
+#### Compile one contract
+
+#### Schema generation
+
+
+
+
+
+### Writing scripts
+
+#### Sample script walkthrough
+
+Polar boilerplate code has sample script `scripts/sample-script.js` with following content: 
+
+```js
+const { Contract, getAccountByName } = require("secret-polar");
+
+async function run (runtimeEnv) {
+  const contract_owner = getAccountByName("account_0", runtimeEnv);
+  const contract = new Contract('sample-project', runtimeEnv);
+  await contract.parseSchema();
+
+  const deploy_response = await contract.deploy(contract_owner);
+  console.log(deploy_response);
+
+  const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+  console.log(contract_info);
+
+  const ex_response = await contract.tx.increment(contract_owner);
+  console.log(ex_response);
+
+  const response = await contract.query.get_count();
+  console.log(response);
+}
+
+module.exports = { default: run };
+```
+
+Following is a line-by-line breakdown of the above script:
+
++ Import `Contract` class and `getAccountByName` method from `secret-polar` library.
+
+```js
+const { Contract, getAccountByName } = require("secret-polar");
+```
+
++ `run` function definition. It should have the same signature as below with just one argument `runtimeEnv`. This `run` function is called by polar. Polar runtime environment is explained in detail in the next section.
+
+```js
+async function run (runtimeEnv) {
+```
+
++ Fetch details of account `account_0` into `contract_owner` object.
+
+```js
+  const contract_owner = getAccountByName("account_0", runtimeEnv);
+```
+
++ Create `Contract` object for contract with name `sample-project`.
+
+```js
+  const contract = new Contract('sample-project', runtimeEnv);
+```
+
++ Load schema files for contract `sample-json`. Will generate error if schema files are not present, so make sure to run `polar compile` before running this.
+
+```js
+  await contract.parseSchema();
+```
+
++ Deploy the contract. Network is specified in the `polar run scripts/<script-name> --network <network-name>` command.
+
+```js
+  const deploy_response = await contract.deploy(contract_owner);
+```
+
++ Instantiate contract instance with values `{"count": 102}` and label `"deploy test"` and account `contract_owner`.
+
+```js
+  const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+```
+
++ Execute `increment()` transaction using account `contract_owner`.
+
+```js
+  const ex_response = await contract.tx.increment(contract_owner);
+```
+
++ Fetch count value using query `get_count()`.
+
+```js
+  const response = await contract.query.get_count();
+```
+
++ Export `run` function as default for the script. Default function is called by polar runner.
+
+```js
+module.exports = { default: run };
+```
+
+#### Polar Runtime Environment
+
+Polar runtime environment is used internally by polar. It is created when a polar task is executed using bash command `polar ...`. It can be accessed in REPL using variable `env`. It has following parameters:
+
++ **config**: Has paths of config file, contract sources, artifacts, project root and test path. Other config values such as networks cfg and mocha timeout.
+
+```js
+config: {
+  networks: { testnet: [Object], default: [Object], development: [Object] },
+  mocha: { timeout: 60000 },
+  paths: {
+    root: '/home/uditgulati/yellow',
+    configFile: '/home/uditgulati/yellow/polar.config.js',
+    sources: '/home/uditgulati/yellow/contracts',
+    cache: '/home/uditgulati/yellow/cache',
+    artifacts: '/home/uditgulati/yellow/artifacts',
+    tests: '/home/uditgulati/yellow/test'
+  }
+}
+```
+
++ **runtimeArgs**: Runtime metadata such as network to use etc. Network can be specified in a polar command like `polar ... --network <network-name>`.
+
+```js
+runtimeArgs: {
+  network: 'testnet',
+  showStackTraces: false,
+  version: false,
+  help: false,
+  verbose: false
+}
+```
+
++ **tasks**: List of available tasks with details.
+
+```js
+tasks: {
+  help: SimpleTaskDefinition {
+    ...
+  },
+  init: SimpleTaskDefinition {
+    ...
+  },
+  compile: SimpleTaskDefinition {
+    ...
+  },
+  clean: SimpleTaskDefinition {
+    ...
+  },
+  'node-info': SimpleTaskDefinition {
+    ...
+  },
+  run: SimpleTaskDefinition {
+    ...
+  },
+  repl: SimpleTaskDefinition {
+    ...
+  }
+}
+```
+
++ **network**: Details of the network currently being used.
+
+```js
+network: {
+  name: 'testnet',
+  config: {
+    accounts: [Array],
+    endpoint: 'http://bootstrap.secrettestnet.io',
+    chainId: 'holodeck-2',
+    trustNode: true,
+    keyringBackend: 'test',
+    types: {}
+  }
+}
+```
+
+#### Contract class
+
+Contract class is used to create an object which does operations related to a contract such as deploying, interacting with network. One can also list query, execute methods available for the contract using this class.
+
+**Constructor**
+
+Contract constructor requires 2 arguments, contract name and polar runtime environment. If contract `.wasm` file is not present in artifacts then this constructor will throw an error.
+
+```js
+const contract = new Contract(<contract-name>, env);
+```
+
+**parseSchema()**
+
+This method reads schema files from `artifacts/schema/` dir and fills query methods in `contract.query` object and execute methods in `contract.tx` object. This method will throw error if schema is not generated.
+
+```js
+contract.parseSchema();
+```
+
+**deploy()**
+
+Deploys the contract.
+
+```js
+const deploy_response = await contract.deploy(contract_owner);
+```
+
+Gives following response:
+
+```js
+{
+  codeId: <code-id-val>,
+  contractCodeHash: <code-hash-val>,
+  deployTimestamp: <timestamp>
+}
+```
+
+**instantiate()**
+
+Instantiate the contract.
+
+```js
+const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+```
+
+Gives following response:
+
+```js
+{
+  contractAddress: <contract-address>,
+  instantiateTimestamp: <timestamp>
+}
+```
+
+**tx methods**
+
+To list contract's execute methods, print `contract.tx`.
+
+```js
+polar> contract.tx
+{ increment: [Function (anonymous)], reset: [Function (anonymous)] }
+```
+
+**query methods**
+
+To list contract's query methods, print `contract.query`.
+
+```js
+polar> contract.query
+{ get_count: [Function (anonymous)] }
+```
+
+#### getAccountByName
+
+#### createAccounts
+
+#### Checkpoints
+
+
+
+<!-- 
+### Testing contracts
+
+#### Rust unit tests
+
+#### Rust integration tests
+
+#### Client interaction tests
+
+#### Test scripts
+
+
+
+
+## Troubleshooting
+
+### Verbose logging
+### Common problems
+### Error codes
+
+## API -->
+
+
+## How to start local net and use it's keys in polar
+
+### Setup the Local Developer Testnet
+
+In this document you'll find information on setting up a local Secret Network developer testnet (secretdev).
+
+### Running the docker container
+
+The developer blockchain is configured to run inside a docker container. Install Docker for your environment .
+Open a terminal window and change to your project directory. Then start SecretNetwork, labelled secretdev from here on:
+
+```bash
+docker run -it --rm \
+ -p 26657:26657 -p 26656:26656 -p 1337:1337 \
+ --name secretdev enigmampc/secret-network-sw-dev
+```
+A few accounts are available with the following information that can be used for the development and testing purpose on the localnet.
+
+{
+  "name": "a",
+  "type": "local",
+  "address": "secret12alhz3va0sz9zj7wwtfvxnrpsqhj6lw2dge0zc",
+  "pubkey": "secretpub1addwnpepq2qckftgul7ex8nauluqrdc9y2080wxr0xsve7cmx3lhe777ne59wzg9053",
+  "mnemonic": "tide universe inject switch average weather obvious cube wrist shaft record chat dentist wink collect hungry cycle draw ribbon course royal indoor remind address"
+}
+
+we need to copy the name , address and mnemonic info of the accounts that we get on running the docker in our polar config file. Also it should be noted that the accounts that are to be interacted with must be on the same network. In this case the account must be present on the localnet.
+
+The secretdev docker container can be stopped by CTRL+C. At this point you're running a local SecretNetwork full-node. 
+
+### Checking the node info
+
+We can then check the node info and status of the node. Open a new terminal :
+
+```bash
+polar node-info
+Creating client for network: default
+Network: default
+ChainId: enigma-pub-testnet-3
+Block height: 35
+Node Info:  {
+  node_info: {
+    protocol_version: { p2p: '7', block: '10', app: '0' },
+    id: '115aa0a629f5d70dd1d464bc7e42799e00f4edae',
+    listen_addr: 'tcp://0.0.0.0:26656',
+    network: 'enigma-pub-testnet-3',
+    version: '0.33.8',
+    channels: '4020212223303800',
+    moniker: 'banana',
+    other: { tx_index: 'on', rpc_address: 'tcp://0.0.0.0:26657' }
+  },
+  application_version: {
+    name: 'SecretNetwork',
+    server_name: 'secretd',
+    client_name: 'secretcli',
+    version: '1.0.4-debug-print-45-g038cd80b',
+    commit: '',
+    build_tags: 'netgo ledger sw',
+    go: 'go version go1.15.5 linux/amd64'
+  }
+}
+```
+
+### Compile the contract
+
+Then we need to compile the contract. This can be done by the following command.
+
+```bash
+polar compile
+```
+
+### Running scripts on Localnet
+
+To run any script on localnet open a new terminal :
+
+```bash
+polar run scripts/sample-script.js
+```
+
+
+
+
