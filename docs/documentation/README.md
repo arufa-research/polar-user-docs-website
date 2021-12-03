@@ -75,7 +75,7 @@ To see the possible tasks (commands) that are available, run `polar` in your pro
 
 ```bash
 $ polar
-polar version 0.2.0
+polar version 0.5.0
 
 Usage: polar [GLOBAL OPTIONS] <TASK> [TASK OPTIONS]
 
@@ -91,15 +91,17 @@ GLOBAL OPTIONS:
 
 AVAILABLE TASKS:
 
-  clean    	Clears the cache and deletes all artifacts
+  clean    	Clears the cache and deletes specified artifacts files
   compile  	Compile all secret contracts
   help     	Prints this message
   init     	Initializes a new project in the given directory
+  install  	Setup rust compiler
   node-info	Prints node info and status
   repl     	Opens polar console
   run      	Runs a user-defined script after compiling the project
+  test     	Runs a user-defined test script after compiling the project
 
-To get help for a specific task run: npx polar help [task]
+To get help for a specific task run: polar help [task]
 
 ```
 
@@ -124,8 +126,7 @@ const accounts = [
 module.exports = {
   networks: {
     default: {
-      endpoint: 'http://localhost:1337/',
-      accounts: accounts
+      endpoint: 'http://localhost:1337/'
     },
     development: {
       endpoint: 'tcp://0.0.0.0:26656',
@@ -134,18 +135,31 @@ module.exports = {
       keyringBackend: 'test',
       types: {}
     },
-    // Holodeck Testnet
+    // Supernova Testnet
     testnet: {
-      endpoint: 'http://bootstrap.secrettestnet.io',
-      chainId: 'holodeck-2',
+      endpoint: 'http://bootstrap.supernova.enigma.co:1317',
+      chainId: 'supernova-2',
       trustNode: true,
       keyringBackend: 'test',
       accounts: accounts,
-      types: {}
+      types: {},
+      fees: {
+        upload: {
+            amount: [{ amount: "500000", denom: "uscrt" }],
+            gas: "2000000",
+        },
+        init: {
+            amount: [{ amount: "125000", denom: "uscrt" }],
+            gas: "500000",
+        },
+      }
     }
   },
   mocha: {
     timeout: 60000
+  },
+  rust: {
+    version: "1.55.0"
   }
 };
 ```
@@ -230,9 +244,9 @@ A sample script `scripts/sample-script.js` is available in the boilerplate. Cont
 ```js
 const { Contract, getAccountByName } = require("secret-polar");
 
-async function run (runtimeEnv) {
-  const contract_owner = getAccountByName("account_0", runtimeEnv);
-  const contract = new Contract('sample-project', runtimeEnv);
+async function run () {
+  const contract_owner = getAccountByName("account_0");
+  const contract = new Contract('sample-project');
   await contract.parseSchema();
 
   const deploy_response = await contract.deploy(contract_owner);
@@ -241,7 +255,7 @@ async function run (runtimeEnv) {
   const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
   console.log(contract_info);
 
-  const ex_response = await contract.tx.increment(contract_owner);
+  const ex_response = await contract.tx.increment(contract_owner, []);
   console.log(ex_response);
 
   const response = await contract.query.get_count();
@@ -272,21 +286,21 @@ polar> config
 {
   name: 'testnet',
   config: {
-    accounts: [ [Object], [Object] ],
-    endpoint: 'http://bootstrap.secrettestnet.io',
-    chainId: 'holodeck-2',
+    accounts: [ [Object], [Object], [Object], [Object] ],
+    endpoint: 'http://bootstrap.supernova.enigma.co:1317',
+    chainId: 'supernova-2',
     trustNode: true,
     keyringBackend: 'test',
     types: {}
   }
 }
-polar> const contract_owner = polar.getAccountByName("account_0", env);
+polar> const contract_owner = polar.getAccountByName("account_0");
 Creating client for network: testnet
 undefined
-polar> const contract = new polar.Contract('sample-project', env);
+polar> const contract = new polar.Contract('sample-project');
 Creating client for network: testnet
 undefined
-polar> const deploy_response = await contract.deploy(contract_owner);
+polar> const deploy_response = await contract.deploy(contract_owner, []);
 Creating compressed .wasm file using cosmwasm/rust-optimizer:0.12.0...
 ```
 
@@ -298,31 +312,40 @@ Node information can be fetched using `polar node-info --network <network-name>`
 
 ```bash
 $ polar node-info --network testnet
-Creating client for network: testnet
 Network: testnet
-ChainId: holodeck-2
-Block height: 4778315
+ChainId: supernova-2
+Block height: 752832
 Node Info:  {
   node_info: {
-    protocol_version: { p2p: '7', block: '10', app: '0' },
-    id: '64b03220d97e5dc21ec65bf7ee1d839afb6f7193',
+    protocol_version: { p2p: '8', block: '11', app: '0' },
+    id: 'ab6394e953e0b570bb1deeb5a8b387aa0dc6188a',
     listen_addr: 'tcp://0.0.0.0:26656',
-    network: 'holodeck-2',
-    version: '0.33.8',
-    channels: '4020212223303800',
-    moniker: 'ChainofSecretsBootstrap',
+    network: 'supernova-2',
+    version: '0.34.12',
+    channels: '40202122233038606100',
+    moniker: 'sg-testnet-0',
     other: { tx_index: 'on', rpc_address: 'tcp://0.0.0.0:26657' }
   },
   application_version: {
     name: 'SecretNetwork',
     server_name: 'secretd',
-    client_name: 'secretcli',
-    version: '1.0.4-2-ge24cdfde',
-    commit: 'e24cdfde5cd3b4bdd9b6ca429aafaa552b95e2bf',
-    build_tags: 'netgo ledger hw develop',
-    go: 'go version go1.13.4 linux/amd64'
+    version: '1.2.0-beta1-79-g660cb1d9',
+    commit: '',
+    build_tags: 'netgo ledger hw production',
+    go: 'go version go1.15.5 linux/amd64',
+    build_deps: [
+      'filippo.io/edwards25519@v1.0.0-beta.2',
+      'github.com/99designs/keyring@v1.1.6',
+      ...
+      'gopkg.in/ini.v1@v1.62.0',
+      'gopkg.in/yaml.v2@v2.4.0',
+      'gopkg.in/yaml.v3@v3.0.0-20210107192922-496545a6307b',
+      'nhooyr.io/websocket@v1.8.6'
+    ],
+    cosmos_sdk_version: 'v0.44.1'
   }
 }
+
 ```
 
 #### Cleanup artifacts
@@ -421,8 +444,6 @@ $ sudo apt install build-essential
 ```
 
 
-
-
 ### Setting up a project
 
 Project setup can be broken down to 3 steps broadly, which are boiler plate generation, updating project name and updating `polar.config.js` file.
@@ -433,7 +454,7 @@ Use command `polar init <project-name>` to generate boilerplate code.
 
 ```bash
 $ polar init yellow
-★ Welcome to polar v0.2.0
+★ Welcome to polar v0.5.0
 Initializing new project in /home/uditgulati/yellow.
 
 ★ Project created ★
@@ -535,18 +556,29 @@ Polar uses config file `polar.config.js` to execute tasks for the given project.
 + trustNode: Should be set to `true`.
 + keyringBackend: Alias of keyring backend to be used.
 + accounts: Array of accounts.
++ fess: custom fees limits for each type of txns from upload, init, execute and send.
 
 ```js
 networks: {
-  // Holodeck Testnet
-  testnet: {
-    endpoint: 'http://bootstrap.secrettestnet.io',
-    chainId: 'holodeck-2',
-    trustNode: true,
-    keyringBackend: 'test',
-    accounts: accounts,
-    types: {}
-  }
+  // Supernova Testnet
+    testnet: {
+      endpoint: 'http://bootstrap.supernova.enigma.co:1317',
+      chainId: 'supernova-2',
+      trustNode: true,
+      keyringBackend: 'test',
+      accounts: accounts,
+      types: {},
+      fees: {
+        upload: {
+            amount: [{ amount: "500000", denom: "uscrt" }],
+            gas: "2000000",
+        },
+        init: {
+            amount: [{ amount: "125000", denom: "uscrt" }],
+            gas: "500000",
+        },
+      }
+    }
 }
 ```
 
@@ -580,7 +612,6 @@ mocha: {
 ```
 
 
-
 ### Compiling your contracts
 
 #### Compile all contracts
@@ -588,8 +619,6 @@ mocha: {
 #### Compile one contract
 
 #### Schema generation
-
-
 
 
 
@@ -602,9 +631,9 @@ Polar boilerplate code has sample script `scripts/sample-script.js` with followi
 ```js
 const { Contract, getAccountByName } = require("secret-polar");
 
-async function run (runtimeEnv) {
-  const contract_owner = getAccountByName("account_0", runtimeEnv);
-  const contract = new Contract('sample-project', runtimeEnv);
+async function run () {
+  const contract_owner = getAccountByName("account_0");
+  const contract = new Contract('sample-project');
   await contract.parseSchema();
 
   const deploy_response = await contract.deploy(contract_owner);
@@ -613,7 +642,7 @@ async function run (runtimeEnv) {
   const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
   console.log(contract_info);
 
-  const ex_response = await contract.tx.increment(contract_owner);
+  const ex_response = await contract.tx.increment(contract_owner, []);
   console.log(ex_response);
 
   const response = await contract.query.get_count();
@@ -631,22 +660,22 @@ Following is a line-by-line breakdown of the above script:
 const { Contract, getAccountByName } = require("secret-polar");
 ```
 
-+ `run` function definition. It should have the same signature as below with just one argument `runtimeEnv`. This `run` function is called by polar. Polar runtime environment is explained in detail in the next section.
++ `run` function definition. It should have the same signature as below with no argument. This `run` function is called by polar.
 
 ```js
-async function run (runtimeEnv) {
+async function run () {
 ```
 
 + Fetch details of account `account_0` into `contract_owner` object.
 
 ```js
-  const contract_owner = getAccountByName("account_0", runtimeEnv);
+  const contract_owner = getAccountByName("account_0");
 ```
 
 + Create `Contract` object for contract with name `sample-project`.
 
 ```js
-  const contract = new Contract('sample-project', runtimeEnv);
+  const contract = new Contract('sample-project');
 ```
 
 + Load schema files for contract `sample-json`. Will generate error if schema files are not present, so make sure to run `polar compile` before running this.
@@ -667,10 +696,10 @@ async function run (runtimeEnv) {
   const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
 ```
 
-+ Execute `increment()` transaction using account `contract_owner`.
++ Execute `increment()` transaction using account `contract_owner`. For each contract execute method, calling signature is `contract.tx.<method_name>(<signing_account>, <tokens_to_send_with_txn>, ...<method_args>);`.
 
 ```js
-  const ex_response = await contract.tx.increment(contract_owner);
+  const ex_response = await contract.tx.increment(contract_owner, []);
 ```
 
 + Fetch count value using query `get_count()`.
@@ -689,7 +718,7 @@ module.exports = { default: run };
 
 Polar runtime environment is used internally by polar. It is created when a polar task is executed using bash command `polar ...`. It can be accessed in REPL using variable `env`. It has following parameters:
 
-+ **config**: Has paths of config file, contract sources, artifacts, project root and test path. Other config values such as networks cfg and mocha timeout.
++ **config**: Has paths of config file, contract sources, artifacts, project root and test path. Other config values such as networks config and mocha timeout.
 
 ```js
 config: {
@@ -753,8 +782,8 @@ network: {
   name: 'testnet',
   config: {
     accounts: [Array],
-    endpoint: 'http://bootstrap.secrettestnet.io',
-    chainId: 'holodeck-2',
+    endpoint: 'http://bootstrap.supernova.enigma.co:1317',
+    chainId: 'supernova-2',
     trustNode: true,
     keyringBackend: 'test',
     types: {}
@@ -768,10 +797,10 @@ Contract class is used to create an object which does operations related to a co
 
 **Constructor**
 
-Contract constructor requires 2 arguments, contract name and polar runtime environment. If contract `.wasm` file is not present in artifacts then this constructor will throw an error.
+Contract constructor requires 1 argument, contract name. If contract `.wasm` file is not present in artifacts then this constructor will throw an error.
 
 ```js
-const contract = new Contract(<contract-name>, env);
+const contract = new Contract(<contract-name>);
 ```
 
 **parseSchema()**
@@ -866,7 +895,7 @@ polar> contract.query
 ## API -->
 
 
-## How to start local net and use it's keys in polar
+## Using localnet with polar
 
 ### Setup the Local Developer Testnet
 
@@ -944,7 +973,3 @@ To run any script on localnet open a new terminal :
 ```bash
 polar run scripts/sample-script.js
 ```
-
-
-
-
