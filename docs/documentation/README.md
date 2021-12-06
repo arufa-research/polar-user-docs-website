@@ -355,95 +355,6 @@ To clear artifacts data, use `polar clean` and to clean artifacts for only one c
 
 ## Guides
 
-
-### Setup rust environment
-
-Polar requires a Rust environment installed on local machine to work properly. This Rust environment can be installed in two possible ways.
-
-#### Installing using polar
-
-Use command `polar setup` to install the Rust environment using just one command.
-
-```bash
-$ polar setup
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-info: downloading installer
-
-Welcome to Rust!
-
-This will download and install the official compiler for the Rust
-programming language, and its package manager, Cargo.
-
-Rustup metadata and toolchains will be installed into the Rustup
-home directory, located at:
-
-  /home/uditgulati/.rustup
-
-This can be modified with the RUSTUP_HOME environment variable.
-
-The Cargo home directory located at:
-
-  /home/uditgulati/.cargo
-
-This can be modified with the CARGO_HOME environment variable.
-
-The cargo, rustc, rustup and other commands will be added to
-Cargo's bin directory, located at:
-
-  /home/uditgulati/.cargo/bin
-
-This path will then be added to your PATH environment variable by
-modifying the profile files located at:
-
-  /home/uditgulati/.profile
-  /home/uditgulati/.bashrc
-
-You can uninstall at any time with rustup self uninstall and
-these changes will be reverted.
-
-Current installation options:
-
-
-   default host triple: x86_64-unknown-linux-gnu
-     default toolchain: stable (default)
-               profile: default
-  modify PATH variable: yes
-...
-```
-
-#### Installing manually
-
-**Linux**
-
-+ Install `rustup`.
-
-```bash
-$ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-$ export PATH="${HOME}/.cargo/bin:${PATH}"
-```
-
-+ Add `wasm32-unknown-unknown` target to `rustup stable` version.
-
-```bash
-$ rustup default stable
-$ rustup target list --installed
-$ rustup target add wasm32-unknown-unknown
-```
-
-+ Install `nightly` toolchain. Add `wasm32-unknown-unknown` target to `rustup nightly` version.
-
-```bash
-$ rustup install nightly
-$ rustup target add wasm32-unknown-unknown --toolchain nightly
-```
-
-+ Install `build-essentials`.
-
-```bash
-$ sudo apt install build-essential
-```
-
-
 ### Setting up a project
 
 Project setup can be broken down to 3 steps broadly, which are boiler plate generation, updating project name and updating `polar.config.js` file.
@@ -1121,6 +1032,7 @@ docker run -it --rm \
 ```
 A few accounts are available with the following information that can be used for the development and testing purpose on the localnet.
 
+```js
 {
   "name": "a",
   "type": "local",
@@ -1128,6 +1040,7 @@ A few accounts are available with the following information that can be used for
   "pubkey": "secretpub1addwnpepq2qckftgul7ex8nauluqrdc9y2080wxr0xsve7cmx3lhe777ne59wzg9053",
   "mnemonic": "tide universe inject switch average weather obvious cube wrist shaft record chat dentist wink collect hungry cycle draw ribbon course royal indoor remind address"
 }
+```
 
 we need to copy the name , address and mnemonic info of the accounts that we get on running the docker in our polar config file. Also it should be noted that the accounts that are to be interacted with must be on the same network. In this case the account must be present on the localnet.
 
