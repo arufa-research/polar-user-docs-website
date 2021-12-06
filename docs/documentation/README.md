@@ -75,7 +75,7 @@ To see the possible tasks (commands) that are available, run `polar` in your pro
 
 ```bash
 $ polar
-polar version 0.5.0
+polar version 0.9.0
 
 Usage: polar [GLOBAL OPTIONS] <TASK> [TASK OPTIONS]
 
@@ -413,7 +413,7 @@ Use command `polar init <project-name>` to generate boilerplate code. Use comman
 
 ```bash
 $ polar init yellow
-★ Welcome to polar v0.5.0
+★ Welcome to polar v0.9.0
 Initializing new project in /home/uditgulati/yellow.
 
 ★ Project created ★
