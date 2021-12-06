@@ -345,13 +345,11 @@ Node Info:  {
     cosmos_sdk_version: 'v0.44.1'
   }
 }
-
 ```
 
 #### Cleanup artifacts
 
 To clear artifacts data, use `polar clean` and to clean artifacts for only one contract, use `polar clean <contract-name>`.
-
 
 ## Guides
 
@@ -953,7 +951,7 @@ use(polarChai);
 
 #### Setup the Local Developer Testnet
 
-In this document you'll find information on setting up a local Secret Network developer testnet (secretdev).
+In this document you'll find information on setting up a local Secret Network.
 
 #### Running the docker container
 
@@ -977,7 +975,7 @@ A few accounts are available with the following information that can be used for
 }
 ```
 
-we need to copy the name , address and mnemonic info of the accounts that we get on running the docker in our polar config file. Also it should be noted that the accounts that are to be interacted with must be on the same network. In this case the account must be present on the localnet.
+we need to copy the name, address and mnemonic info of the accounts that we get on running the docker in our polar config file. Also it should be noted that the accounts that are to be interacted with must be on the same network. In this case the account must be present on the localnet.
 
 The secretdev docker container can be stopped by CTRL+C. At this point you're running a local SecretNetwork full-node. 
 
@@ -1016,7 +1014,7 @@ Node Info:  {
 
 #### Compile the contract
 
-Then we need to compile the contract. This can be done by the following command.
+Then we need to compile the contract. This can be done by the following command:
 
 ```bash
 polar compile
@@ -1024,7 +1022,7 @@ polar compile
 
 #### Running scripts on Localnet
 
-To run any script on localnet open a new terminal :
+To run any script on localnet open a new terminal and execute:
 
 ```bash
 polar run scripts/sample-script.js
