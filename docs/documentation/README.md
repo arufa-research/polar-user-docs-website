@@ -678,76 +678,11 @@ Polar runtime environment is used internally by polar. It is created when a pola
 
 + **config**: Has paths of config file, contract sources, artifacts, project root and test path. Other config values such as networks config and mocha timeout.
 
-```js
-config: {
-  networks: { testnet: [Object], default: [Object], development: [Object] },
-  mocha: { timeout: 60000 },
-  paths: {
-    root: '/home/uditgulati/yellow',
-    configFile: '/home/uditgulati/yellow/polar.config.js',
-    sources: '/home/uditgulati/yellow/contracts',
-    cache: '/home/uditgulati/yellow/cache',
-    artifacts: '/home/uditgulati/yellow/artifacts',
-    tests: '/home/uditgulati/yellow/test'
-  }
-}
-```
-
 + **runtimeArgs**: Runtime metadata such as network to use etc. Network can be specified in a polar command like `polar ... --network <network-name>`.
-
-```js
-runtimeArgs: {
-  network: 'testnet',
-  showStackTraces: false,
-  version: false,
-  help: false,
-  verbose: false
-}
-```
 
 + **tasks**: List of available tasks with details.
 
-```js
-tasks: {
-  help: SimpleTaskDefinition {
-    ...
-  },
-  init: SimpleTaskDefinition {
-    ...
-  },
-  compile: SimpleTaskDefinition {
-    ...
-  },
-  clean: SimpleTaskDefinition {
-    ...
-  },
-  'node-info': SimpleTaskDefinition {
-    ...
-  },
-  run: SimpleTaskDefinition {
-    ...
-  },
-  repl: SimpleTaskDefinition {
-    ...
-  }
-}
-```
-
 + **network**: Details of the network currently being used.
-
-```js
-network: {
-  name: 'testnet',
-  config: {
-    accounts: [Array],
-    endpoint: 'http://bootstrap.supernova.enigma.co:1317',
-    chainId: 'supernova-2',
-    trustNode: true,
-    keyringBackend: 'test',
-    types: {}
-  }
-}
-```
 
 #### Contract class
 
