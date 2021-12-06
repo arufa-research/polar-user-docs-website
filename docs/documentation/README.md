@@ -913,24 +913,184 @@ polar> contract.query
 
 #### getAccountByName
 
+In the sample `polar.config.js` file, the accounts are defined as below:
+
+```js
+const accounts = [
+  {
+    name: 'account_0',
+    address: 'secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk',
+    mnemonic: 'snack cable erode art lift better october drill hospital clown erase address'
+  },
+  {
+    name: 'account_1',
+    address: 'secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv',
+    mnemonic: 'sorry object nation also century glove small tired parrot avocado pulp purchase'
+  }
+];
+```
+
+These accounts can be easily accessed inside the scripts or in repl using the method, `getAccountByName(<account_name>)`, for example:
+
+```js
+const { getAccountByName } = require("secret-polar");
+
+const account_0 = getAccountByName("account_0");
+const account_1 = getAccountByName("account_1");
+
+console.log(account_0.name);  // account_0
+console.log(account_0.address); // secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk
+console.log(account_0.mnemonic); // snack cable erode art lift better october drill hospital clown erase address
+```
 
 #### createAccounts
 
+This method is used to generate new accounts and then can be filled with some balance using a testnet faucet `https://faucet.supernova.enigma.co/` (faucet are only for testnets). 
+
+```js
+const { createAccounts } = require("secret-polar");
+
+const res = await createAccounts(1); // array of one account object
+const res = await createAccounts(3);  // array of three account objects
+```
+
 #### Checkpoints
 
+Checkpoints store the metadata of contract instance on the network. It stores the deploy metadata (codeId, contractCodeHash, deployTimestamp) and instantiate metadata (contractAddress, instantiateTimestamp). This comes handy when a script is run which deploys, inits and does some interactions with the contracts. 
 
+Suppose the script fails after init step and now script is to be rerun after some fixes in the contract, here one does not want for the contract to be deployed and instantiated again, so polar picks up the saved metadata from checkpoints file and directly skips to part after init and uses the previously deployed instance and user does not have to pay the extra gas and wait extra time to deploy, init the contract again. Same happens when there is error before init and rerun skips deploy and directly executes init step.
 
 ### Testing contracts
 
-#### Rust unit tests
+Contracts can be tested in two ways, one by writing rust tests in the `contract.rs` file itself, and other way is to write a mocha test script that interacts with deployed contract and assert the returned values. There are examples for both in the `sample-project` created after `polar init` step.
 
-#### Rust integration tests
+#### Rust tests
+
+These tests can be run by going into the contract's directory having `Cargo.toml` file and running the command `cargo test`.
 
 #### Client interaction tests
 
+These tests can be run by running the command `polar run test --network <network-name>`.
+
 #### Test scripts
 
+Polar has support for user to write tests on top of js interactions with the deployed contract instance. These scripts are stored in the `test/` directory in the project's root directory.
 
+A polar test script has the same structure as a mocha test file with `describe` and `it` blocks, a sample test is explained below:
+
+```js
+const { expect, use } = require("chai");
+const { Contract, getAccountByName, polarChai } = require("secret-polar");
+
+use(polarChai);
+
+describe("sample_project", () => {
+  async function setup() {
+    const contract_owner = getAccountByName("account_1");
+    const other = getAccountByName("account_0");
+    const contract = new Contract("sample-project");
+    await contract.parseSchema();
+
+    return { contract_owner, other, contract };
+  }
+
+  it("deploy and init", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+
+    await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
+  });
+  
+  it("unauthorized reset", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+    
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+    
+    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+    await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
+  });
+
+  it("increment", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+
+    const ex_response = await contract.tx.increment(contract_owner, []);
+    await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
+  });
+});
+```
+
+Following is a breakdown of the above script:
+
++ Import `expect` and `use` from chai, `Contract`, `getAccountByName` and `polarChai` from secret-polar and add polar asserts to chai using `use(polarChai)`.
+
+```js
+const { expect, use } = require("chai");
+const { Contract, getAccountByName, polarChai } = require("secret-polar");
+
+use(polarChai);
+```
+
++ `setup()` method does the initial common steps for each test, such as creating `Account` objects, creating `Contract` objects and parsing contract's schema files.
+
+```js
+  async function setup() {
+    const contract_owner = getAccountByName("account_1");
+    const other = getAccountByName("account_0");
+    const contract = new Contract("sample-project");
+    await contract.parseSchema();
+
+    return { contract_owner, other, contract };
+  }
+```
+
++ First test: Deploys, inits the contract and tests query count value.
+
+```js
+  it("deploy and init", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+
+    await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
+  });
+```
+
++ Second test: Deploys, inits the contract and tests query unauthorized execution of `reset()` transaction.
+
+```js
+  it("unauthorized reset", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+    
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+    
+    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+    await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
+  });
+```
+
++ Third test: Deploys, inits the contract and tests `increment` transaction.
+
+```js
+  it("increment", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+
+    const ex_response = await contract.tx.increment(contract_owner, []);
+    await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
+  });
+```
+
+**Note:** It is fine to have `deploy`, `instantiate` in each test as they are not executed multiple times for a given contract. Moving these steps in the `setup()` method is fine too.
 
 <!--
 
@@ -943,13 +1103,13 @@ polar> contract.query
 ## API -->
 
 
-## Using localnet with polar
+### Using localnet with polar
 
-### Setup the Local Developer Testnet
+#### Setup the Local Developer Testnet
 
 In this document you'll find information on setting up a local Secret Network developer testnet (secretdev).
 
-### Running the docker container
+#### Running the docker container
 
 The developer blockchain is configured to run inside a docker container. Install Docker for your environment .
 Open a terminal window and change to your project directory. Then start SecretNetwork, labelled secretdev from here on:
@@ -973,7 +1133,7 @@ we need to copy the name , address and mnemonic info of the accounts that we get
 
 The secretdev docker container can be stopped by CTRL+C. At this point you're running a local SecretNetwork full-node. 
 
-### Checking the node info
+#### Checking the node info
 
 We can then check the node info and status of the node. Open a new terminal :
 
@@ -1006,7 +1166,7 @@ Node Info:  {
 }
 ```
 
-### Compile the contract
+#### Compile the contract
 
 Then we need to compile the contract. This can be done by the following command.
 
@@ -1014,7 +1174,7 @@ Then we need to compile the contract. This can be done by the following command.
 polar compile
 ```
 
-### Running scripts on Localnet
+#### Running scripts on Localnet
 
 To run any script on localnet open a new terminal :
 
