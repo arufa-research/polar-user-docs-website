@@ -166,7 +166,6 @@ module.exports = {
 
 **Note** that the accounts mentioned above are just a sample, don't use them in mainnet as it can lead to capital loss.
 
-
 #### Compiling contracts
 
 To compile the contracts, use command `polar compile`. This will compile all the contracts in the project. To compile only one contracts or a subset of all contracts in the project, use command `polar compile <contract-source-dir>`. 
@@ -269,9 +268,60 @@ The script above deploys, inits contract `sample-project` using account `account
 
 For the above script to be able to run, an account with name `account_0` must be present in `polar.config.js` and contract artifacts (compiled `.wasm` and schema `.json` files) in `artifacts/` dir must be present for contract `sample-project`.
 
-#### Running tests
+#### Running test scripts
 
-TODO: This section will be added once testing framework is added to Polar.
+Test scripts are used to test the contract after deploying it to the network and asserting on the interactions with the contract instance.
+
+A sample test script `test/sample-test.js` is available in the boilerplate. Contents of the script is as follows:
+
+```js
+const { expect, use } = require("chai");
+const { Contract, getAccountByName, polarChai } = require("secret-polar");
+
+use(polarChai);
+
+describe("sample_project", () => {
+  async function setup() {
+    const contract_owner = getAccountByName("account_1");
+    const other = getAccountByName("account_0");
+    const contract = new Contract("sample-project");
+    await contract.parseSchema();
+
+    return { contract_owner, other, contract };
+  }
+
+  it("deploy and init", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+
+    await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
+  });
+
+  it("unauthorized reset", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+
+    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+    await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
+  });
+
+  it("increment", async () => {
+    const { contract_owner, other, contract } = await setup();
+    const deploy_response = await contract.deploy(contract_owner);
+
+    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+
+    const ex_response = await contract.tx.increment(contract_owner, []);
+    await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
+  });
+});
+```
+
+Detailed overview of testing is given the Guides section.
 
 #### Using REPL
 
@@ -359,7 +409,7 @@ Project setup can be broken down to 3 steps broadly, which are boiler plate gene
 
 #### Boilerplate code
 
-Use command `polar init <project-name>` to generate boilerplate code.
+Use command `polar init <project-name>` to generate boilerplate code. Use command `polar init <project-name> <template-name` to generate boilerplate code using a particular template (template names can be found from repository `https://github.com/arufa-research/polar-templates`).
 
 ```bash
 $ polar init yellow
@@ -846,13 +896,13 @@ describe("sample_project", () => {
 
     await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
   });
-  
+
   it("unauthorized reset", async () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
-    
+
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
-    
+
     await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
     await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
   });
