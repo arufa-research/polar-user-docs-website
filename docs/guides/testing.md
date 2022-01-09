@@ -40,14 +40,14 @@ describe("sample_project", () => {
 
     await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
   });
-
+  
   it("unauthorized reset", async () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
-
+    
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
-
-    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+    
+    await expect(contract.tx.reset({account: other}, 100)).to.be.revertedWith("unauthorized");
     await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
   });
 
@@ -57,7 +57,7 @@ describe("sample_project", () => {
 
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
 
-    const ex_response = await contract.tx.increment(contract_owner, []);
+    const ex_response = await contract.tx.increment({account: contract_owner});
     await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
   });
 });
@@ -87,7 +87,7 @@ use(polarChai);
   }
 ```
 
-+ First test: Deploys, inits the contract and tests query count value.
++ First test: Deploys, inits the contract and tests query count value. Polar automatically creates dynamic label for test deploys, which means that below label "deploy test" is not used instead "deploy <contract_name> <curr_ts>" is used which is always unique, so you don't have to manually change label for each test run.
 
 ```js
   it("deploy and init", async () => {
@@ -109,7 +109,7 @@ use(polarChai);
     
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
     
-    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+    await expect(contract.tx.reset({account: other}, 100)).to.be.revertedWith("unauthorized");
     await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
   });
 ```
@@ -123,7 +123,7 @@ use(polarChai);
 
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
 
-    const ex_response = await contract.tx.increment(contract_owner, []);
+    const ex_response = await contract.tx.increment({account: contract_owner});
     await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
   });
 ```
@@ -156,7 +156,7 @@ await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
 Testing if transaction was reverted:
 
 ```js
-await expect(contract.tx.reset(other, [], 100)).to.be.reverted;
+await expect(contract.tx.reset({account: other}, 100)).to.be.reverted;
 ```
 
 + **Revert with message**
@@ -164,7 +164,7 @@ await expect(contract.tx.reset(other, [], 100)).to.be.reverted;
 Testing if transaction was reverted with certain message:
 
 ```js
-await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+await expect(contract.tx.reset({account: other}, 100)).to.be.revertedWith("unauthorized");
 ```
 
 + **Change SCRT balance**
@@ -174,7 +174,7 @@ Testing whether the transaction changes the SCRT (native token of chain) balance
 ```js
 const transferAmount = [{"denom": "uscrt", "amount": "15000000"}] // 15 SCRT
 
-await expect(() => await contract.tx.increment(contract_owner, transferAmount))
+await expect(() => await contract.tx.increment({account: contract_owner, transferAmount: transferAmount}))
   .to.changeScrtBalance(AddressTo, 15000000);
 ```
 
@@ -184,11 +184,11 @@ changeScrtBalance ignores transaction fees by default:
 const transferAmount = [{"denom": "uscrt", "amount": "15000000"}] // 15 SCRT
 
 // Default behavior
-await expect(() => await contract.tx.increment(contract_owner, transferAmount))
+await expect(() => await contract.tx.increment({account: contract_owner, transferAmount: transferAmount}))
   .to.changeScrtBalance(AddressTo, 15000000);
 
 // To include the transaction fee use:
-await expect(() => await contract.tx.increment(contract_owner, transferAmount))
+await expect(() => await contract.tx.increment({account: contract_owner, transferAmount: transferAmount}))
   .to.changeScrtBalance(AddressFrom, 15020000, true);
 ```
 
@@ -199,7 +199,7 @@ Testing whether the transfer changes the balance of the account:
 ```js
 const transferAmount = [{"denom": "usefi", "amount": "15000000"}] // 15 SEFI
 
-await expect(() => await contract.tx.increment(contract_owner, transferAmount))
+await expect(() => await contract.tx.increment({account: contract_owner, transferAmount: transferAmount}))
   .to.changeTokenBalance(AddressTo, "usefi", 15000000);
 ```
 
@@ -212,7 +212,7 @@ Testing whether the transaction changes balance of multiple accounts:
 ```js
 const transferAmount = [{"denom": "usefi", "amount": "15000000"}] // 15 SEFI
 
-await expect(() => await contract.tx.increment(contract_owner, transferAmount))
+await expect(() => await contract.tx.increment({account: contract_owner, transferAmount: transferAmount}))
   .to.changeTokenBalance([AddressTo, AddressFrom], "usefi", [15000000, -15000000]);
 ```
 

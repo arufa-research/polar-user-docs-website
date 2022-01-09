@@ -12,7 +12,7 @@ To compile only one contract or a subset of all contracts in the `contract/` dir
 
 #### Schema generation
 
-Schema is also generated alongside the compiled `.wasm` file for each of the contract compiled using `polar compile` command. Schema files are `.json` files (stored inside `artifacts/schema/`) directory and there are multiple `.json` files per contract but only one `.wasm` compiled file per contract.
+Schema is also generated alongside the compiled `.wasm` file for each of the contract compiled using `polar compile` command. Schema files are `.json` files (stored inside `artifacts/schema/`) directory and there are multiple `.json` files per contract but only one `.wasm` compiled file per contract. To skip schema generation while compiling use `polar compile --skip-schema`.
 
 Single contract `artifacts/` directory structure:
 

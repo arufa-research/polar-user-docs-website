@@ -6,11 +6,11 @@ Project setup can be broken down to 3 steps broadly, which are boiler plate gene
 
 #### Boilerplate code
 
-Use command `polar init <project-name>` to generate boilerplate code. Use command `polar init <project-name> <template-name` to generate boilerplate code using a particular template (template names can be found from repository `https://github.com/arufa-research/polar-templates`).
+Use command `polar init <project-name>` to generate boilerplate code. Use command `polar init <project-name> <template-name>` to generate boilerplate code using a particular template (template names can be found from repository `https://github.com/arufa-research/polar-templates`).
 
 ```bash
 $ polar init yellow
-★ Welcome to polar v0.9.0
+★ Welcome to polar v0.9.5
 Initializing new project in /home/uditgulati/yellow.
 
 ★ Project created ★
@@ -42,6 +42,17 @@ The generated directory will have the following initial structure:
 │   └── tests
 │       └── integration.rs
 ├── package.json
+├── packages
+│   └── cargo_common
+│       ├── Cargo.lock
+│       ├── Cargo.toml
+│       └── src
+│           ├── balances.rs
+│           ├── cashmap.rs
+│           ├── contract.rs
+│           ├── lib.rs
+│           ├── tokens.rs
+│           └── voting.rs
 ├── polar.config.js
 ├── README.md
 ├── scripts
@@ -49,7 +60,7 @@ The generated directory will have the following initial structure:
 └── test
     └── sample-test.js
 
-6 directories, 13 files
+9 directories, 22 files
 ```
 
 The `contracts/` directory has all the rust files for the contract logic. `scripts/` directory can contain `.js` and `.ts` scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. `test/` directory can contain `.js` and `.ts` scripts to run tests for the deployed contracts.
@@ -63,7 +74,7 @@ $ grep -r "sample-project"
 package.json:  "name": "sample-project",
 contracts/Cargo.lock:name = "sample-project"
 contracts/Cargo.toml:name = "sample-project"
-scripts/sample-script.js:  const contract = new Contract('sample-project', runtimeEnv);
+scripts/sample-script.js:  const contract = new Contract('sample-project');
 ```
 
 ```bash

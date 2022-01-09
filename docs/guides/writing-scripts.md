@@ -5,24 +5,44 @@
 Polar boilerplate code has sample script `scripts/sample-script.js` with following content: 
 
 ```js
+
 const { Contract, getAccountByName } = require("secret-polar");
 
 async function run () {
   const contract_owner = getAccountByName("account_0");
-  const contract = new Contract('sample-project');
+  const contract = new Contract("sample-project");
   await contract.parseSchema();
 
-  const deploy_response = await contract.deploy(contract_owner);
+  const deploy_response = await contract.deploy(
+    contract_owner,
+    { // custom fees
+      amount: [{ amount: "750000", denom: "uscrt" }],
+      gas: "3000000",
+    }
+  );
   console.log(deploy_response);
 
   const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
   console.log(contract_info);
 
-  const ex_response = await contract.tx.increment(contract_owner, []);
-  console.log(ex_response);
+  const inc_response = await contract.tx.increment({account: contract_owner});
+  console.log(inc_response);
 
   const response = await contract.query.get_count();
   console.log(response);
+
+  const transferAmount = [{"denom": "uscrt", "amount": "15000000"}] // 15 SCRT
+  const customFees = { // custom fees
+    amount: [{ amount: "750000", denom: "uscrt" }],
+    gas: "3000000",
+  }
+  const ex_response = await contract.tx.increment(
+    {account: contract_owner, transferAmount: transferAmount}
+  );
+  // const ex_response = await contract.tx.increment(
+  //   {account: contract_owner, transferAmount: transferAmount, customFees: customFees}
+  // );
+  console.log(ex_response);
 }
 
 module.exports = { default: run };
@@ -72,10 +92,10 @@ async function run () {
   const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
 ```
 
-+ Execute `increment()` transaction using account `contract_owner`. For each contract execute method, calling signature is `contract.tx.<method_name>(<signing_account>, <tokens_to_send_with_txn>, ...<method_args>);`.
++ Execute `increment()` transaction using account `contract_owner`. For each contract execute method, calling signature is `contract.tx.<method_name>({account: <signing_account>, transferAmount: <tokens_to_send_with_txn>, customFees: <custom_fees_struct>}, ...<method_args>);`.
 
 ```js
-  const ex_response = await contract.tx.increment(contract_owner, []);
+  const ex_response = await contract.tx.increment({account: contract_owner});
 ```
 
 + Fetch count value using query `get_count()`.
@@ -223,3 +243,5 @@ const res = await createAccounts(3);  // array of three account objects
 Checkpoints store the metadata of contract instance on the network. It stores the deploy metadata (codeId, contractCodeHash, deployTimestamp) and instantiate metadata (contractAddress, instantiateTimestamp). This comes handy when a script is run which deploys, inits and does some interactions with the contracts. 
 
 Suppose the script fails after init step and now script is to be rerun after some fixes in the contract, here one does not want for the contract to be deployed and instantiated again, so polar picks up the saved metadata from checkpoints file and directly skips to part after init and uses the previously deployed instance and user does not have to pay the extra gas and wait extra time to deploy, init the contract again. Same happens when there is error before init and rerun skips deploy and directly executes init step.
+
+To skip using checkpoints when running script, use `polar run <script-path> --skip-checkpoints`.

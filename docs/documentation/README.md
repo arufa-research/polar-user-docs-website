@@ -75,7 +75,7 @@ To see the possible tasks (commands) that are available, run `polar` in your pro
 
 ```bash
 $ polar
-polar version 0.9.0
+polar version 0.9.5
 
 Usage: polar [GLOBAL OPTIONS] <TASK> [TASK OPTIONS]
 
@@ -168,7 +168,7 @@ module.exports = {
 
 #### Compiling contracts
 
-To compile the contracts, use command `polar compile`. This will compile all the contracts in the project. To compile only one contracts or a subset of all contracts in the project, use command `polar compile <contract-source-dir>`. 
+To compile the contracts, use command `polar compile`. This will compile all the contracts in the project. To compile only one contracts or a subset of all contracts in the project, use command `polar compile <contract-source-dir>`. To skip schema generation while compiling use `polar compile --skip-schema`.
 
 ```bash
 $ polar compile
@@ -245,20 +245,39 @@ const { Contract, getAccountByName } = require("secret-polar");
 
 async function run () {
   const contract_owner = getAccountByName("account_0");
-  const contract = new Contract('sample-project');
+  const contract = new Contract("sample-project");
   await contract.parseSchema();
 
-  const deploy_response = await contract.deploy(contract_owner);
+  const deploy_response = await contract.deploy(
+    contract_owner,
+    { // custom fees
+      amount: [{ amount: "750000", denom: "uscrt" }],
+      gas: "3000000",
+    }
+  );
   console.log(deploy_response);
 
   const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
   console.log(contract_info);
 
-  const ex_response = await contract.tx.increment(contract_owner, []);
-  console.log(ex_response);
+  const inc_response = await contract.tx.increment({account: contract_owner});
+  console.log(inc_response);
 
   const response = await contract.query.get_count();
   console.log(response);
+
+  const transferAmount = [{"denom": "uscrt", "amount": "15000000"}] // 15 SCRT
+  const customFees = { // custom fees
+    amount: [{ amount: "750000", denom: "uscrt" }],
+    gas: "3000000",
+  }
+  const ex_response = await contract.tx.increment(
+    {account: contract_owner, transferAmount: transferAmount}
+  );
+  // const ex_response = await contract.tx.increment(
+  //   {account: contract_owner, transferAmount: transferAmount, customFees: customFees}
+  // );
+  console.log(ex_response);
 }
 
 module.exports = { default: run };
@@ -305,7 +324,7 @@ describe("sample_project", () => {
 
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
 
-    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
+    await expect(contract.tx.reset({account: other}, 100)).to.be.revertedWith("unauthorized");
     await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
   });
 
@@ -315,7 +334,7 @@ describe("sample_project", () => {
 
     const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
 
-    const ex_response = await contract.tx.increment(contract_owner, []);
+    const ex_response = await contract.tx.increment({account: contract_owner});
     await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
   });
 });
@@ -350,8 +369,8 @@ undefined
 polar> const contract = new polar.Contract('sample-project');
 Creating client for network: testnet
 undefined
-polar> const deploy_response = await contract.deploy(contract_owner, []);
-Creating compressed .wasm file using cosmwasm/rust-optimizer:0.12.0...
+polar> const deploy_response = await contract.deploy(contract_owner);
+Creating compressed .wasm file for sample_project...
 ```
 
 When REPL is opened, `polar` library is already imported, use `polar.` to access classes and functions from the library. Polar Runtime Environment can be access using `env` variable and `polar.config.js` data can be accessed using `config` variable.
@@ -409,7 +428,7 @@ Project setup can be broken down to 3 steps broadly, which are boiler plate gene
 
 #### Boilerplate code
 
-Use command `polar init <project-name>` to generate boilerplate code. Use command `polar init <project-name> <template-name` to generate boilerplate code using a particular template (template names can be found from repository `https://github.com/arufa-research/polar-templates`).
+Use command `polar init <project-name>` to generate boilerplate code. Use command `polar init <project-name> <template-name>` to generate boilerplate code using a particular template (template names can be found from repository `https://github.com/arufa-research/polar-templates`).
 
 ```bash
 $ polar init yellow
@@ -445,6 +464,17 @@ The generated directory will have the following initial structure:
 │   └── tests
 │       └── integration.rs
 ├── package.json
+├── packages
+│   └── cargo_common
+│       ├── Cargo.lock
+│       ├── Cargo.toml
+│       └── src
+│           ├── balances.rs
+│           ├── cashmap.rs
+│           ├── contract.rs
+│           ├── lib.rs
+│           ├── tokens.rs
+│           └── voting.rs
 ├── polar.config.js
 ├── README.md
 ├── scripts
@@ -452,7 +482,7 @@ The generated directory will have the following initial structure:
 └── test
     └── sample-test.js
 
-6 directories, 13 files
+9 directories, 22 files
 ```
 
 The `contracts/` directory has all the rust files for the contract logic. `scripts/` directory can contain `.js` and `.ts` scripts that user can write according to the use case, a sample script has been added to give some understanding of how a user script should look like. `test/` directory can contain `.js` and `.ts` scripts to run tests for the deployed contracts.
