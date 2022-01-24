@@ -8,7 +8,7 @@ These tests can be run by going into the contract's directory having `Cargo.toml
 
 #### Client interaction tests
 
-These tests can be run by running the command `polar run test --network <network-name>`.
+These tests can be run by running the command `polar test --network <network-name>`.
 
 #### Test scripts
 
