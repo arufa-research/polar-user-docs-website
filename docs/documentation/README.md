@@ -1036,28 +1036,19 @@ In this document you'll find information on setting up a local Secret Network.
 #### Running the docker container
 
 The developer blockchain is configured to run inside a docker container. Install Docker for your environment .
-Open a terminal window and change to your project directory. Then start SecretNetwork, labelled secretdev from here on:
+Open a terminal window and change to your project directory. Then start SecretNetwork, labelled `localsecret` from here on:
 
 ```bash
 docker run -it --rm \
  -p 26657:26657 -p 26656:26656 -p 1337:1337 \
- --name secretdev enigmampc/secret-network-sw-dev
-```
-A few accounts are available with the following information that can be used for the development and testing purpose on the localnet.
-
-```js
-{
-  "name": "a",
-  "type": "local",
-  "address": "secret12alhz3va0sz9zj7wwtfvxnrpsqhj6lw2dge0zc",
-  "pubkey": "secretpub1addwnpepq2qckftgul7ex8nauluqrdc9y2080wxr0xsve7cmx3lhe777ne59wzg9053",
-  "mnemonic": "tide universe inject switch average weather obvious cube wrist shaft record chat dentist wink collect hungry cycle draw ribbon course royal indoor remind address"
-}
+ --name localsecret ghcr.io/scrtlabs/localsecret
 ```
 
-we need to copy the name, address and mnemonic info of the accounts that we get on running the docker in our polar config file. Also it should be noted that the accounts that are to be interacted with must be on the same network. In this case the account must be present on the localnet.
+LocalSecret comes with a few acocunts with pre-seeded SCRT for you to use. You can import them into your environment (Keplr, secretcli, secret.js) using these seeds: https://docs.scrt.network/dev/LocalSecret.html#accounts
 
-The secretdev docker container can be stopped by CTRL+C. At this point you're running a local SecretNetwork full-node. 
+To read the full LocalSecret docs go to: https://docs.scrt.network/dev/LocalSecret.html
+
+The `localsecret` docker container can be stopped by CTRL+C. At this point you're running a local SecretNetwork full-node. 
 
 #### Checking the node info
 
