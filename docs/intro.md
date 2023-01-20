@@ -1,4 +1,8 @@
-# Documentation
+---
+sidebar_position: 1
+---
+
+# Introduction
 
 ## Getting Started
 
@@ -10,8 +14,8 @@ Polar is development framework for building secret contracts. The aim of the pro
 
 Polar can be installed using `npm` or `yarn` using below commands:
 
-+    Using Yarn: `yarn global add secret-polar`
-+    Using NPM: `npm install -g secret-polar`
+- Using Yarn: `yarn global add secret-polar`
+- Using NPM: `npm install -g secret-polar`
 
 Polar requires a local rust environment available to be able to work. To install a rust environment, use command `polar install`.
 
@@ -45,22 +49,22 @@ The generated directory will have the following initial structure:
 ```bash
 .
 ├── contracts
-│   ├── Cargo.lock
-│   ├── Cargo.toml
-│   ├── examples
-│   │   └── schema.rs
-│   ├── src
-│   │   ├── contract.rs
-│   │   ├── lib.rs
-│   │   ├── msg.rs
-│   │   └── state.rs
-│   └── tests
-│       └── integration.rs
+│   ├── Cargo.lock
+│   ├── Cargo.toml
+│   ├── examples
+│   │   └── schema.rs
+│   ├── src
+│   │   ├── contract.rs
+│   │   ├── lib.rs
+│   │   ├── msg.rs
+│   │   └── state.rs
+│   └── tests
+│       └── integration.rs
 ├── package.json
 ├── polar.config.js
 ├── README.md
 ├── scripts
-│   └── sample-script.js
+│   └── sample-script.js
 └── test
     └── sample-test.js
 
@@ -81,12 +85,12 @@ Usage: polar [GLOBAL OPTIONS] <TASK> [TASK OPTIONS]
 
 GLOBAL OPTIONS:
 
-      --config           	Path to POLAR config file. 
-  -h, --help             	Shows this message, or a task's help if its name is provided 
+      --config           	Path to POLAR config file.
+  -h, --help             	Shows this message, or a task's help if its name is provided
       --network          	The network to connect to. (default: "default")
-      --show-stack-traces	Show stack traces. 
-      --verbose          	Enables verbose logging 
-  -v, --version          	Shows version and exit. 
+      --show-stack-traces	Show stack traces.
+      --verbose          	Enables verbose logging
+  -v, --version          	Shows version and exit.
 
 
 AVAILABLE TASKS:
@@ -112,55 +116,57 @@ If you take a look at the `polar.config.js` file, you will find :
 ```js
 const accounts = [
   {
-    name: 'account_0',
-    address: 'secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk',
-    mnemonic: 'snack cable erode art lift better october drill hospital clown erase address'
+    name: "account_0",
+    address: "secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk",
+    mnemonic:
+      "snack cable erode art lift better october drill hospital clown erase address",
   },
   {
-    name: 'account_1',
-    address: 'secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv',
-    mnemonic: 'sorry object nation also century glove small tired parrot avocado pulp purchase'
-  }
+    name: "account_1",
+    address: "secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv",
+    mnemonic:
+      "sorry object nation also century glove small tired parrot avocado pulp purchase",
+  },
 ];
 
 module.exports = {
   networks: {
     default: {
-      endpoint: 'http://localhost:1337/'
+      endpoint: "http://localhost:1337/",
     },
     development: {
-      endpoint: 'tcp://0.0.0.0:26656',
-      nodeId: '115aa0a629f5d70dd1d464bc7e42799e00f4edae',
-      chainId: 'enigma-pub-testnet-3',
-      keyringBackend: 'test',
-      types: {}
+      endpoint: "tcp://0.0.0.0:26656",
+      nodeId: "115aa0a629f5d70dd1d464bc7e42799e00f4edae",
+      chainId: "enigma-pub-testnet-3",
+      keyringBackend: "test",
+      types: {},
     },
     // Supernova Testnet
     testnet: {
-      endpoint: 'http://bootstrap.supernova.enigma.co:1317',
-      chainId: 'supernova-2',
+      endpoint: "http://bootstrap.supernova.enigma.co:1317",
+      chainId: "supernova-2",
       trustNode: true,
-      keyringBackend: 'test',
+      keyringBackend: "test",
       accounts: accounts,
       types: {},
       fees: {
         upload: {
-            amount: [{ amount: "500000", denom: "uscrt" }],
-            gas: "2000000",
+          amount: [{ amount: "500000", denom: "uscrt" }],
+          gas: "2000000",
         },
         init: {
-            amount: [{ amount: "125000", denom: "uscrt" }],
-            gas: "500000",
+          amount: [{ amount: "125000", denom: "uscrt" }],
+          gas: "500000",
         },
-      }
-    }
+      },
+    },
   },
   mocha: {
-    timeout: 60000
+    timeout: 60000,
   },
   rust: {
-    version: "1.55.0"
-  }
+    version: "1.55.0",
+  },
 };
 ```
 
@@ -243,37 +249,41 @@ A sample script `scripts/sample-script.js` is available in the boilerplate. Cont
 ```js
 const { Contract, getAccountByName } = require("secret-polar");
 
-async function run () {
+async function run() {
   const contract_owner = getAccountByName("account_0");
   const contract = new Contract("sample-project");
   await contract.parseSchema();
 
-  const deploy_response = await contract.deploy(
-    contract_owner,
-    { // custom fees
-      amount: [{ amount: "750000", denom: "uscrt" }],
-      gas: "3000000",
-    }
-  );
+  const deploy_response = await contract.deploy(contract_owner, {
+    // custom fees
+    amount: [{ amount: "750000", denom: "uscrt" }],
+    gas: "3000000",
+  });
   console.log(deploy_response);
 
-  const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+  const contract_info = await contract.instantiate(
+    { count: 102 },
+    "deploy test",
+    contract_owner
+  );
   console.log(contract_info);
 
-  const inc_response = await contract.tx.increment({account: contract_owner});
+  const inc_response = await contract.tx.increment({ account: contract_owner });
   console.log(inc_response);
 
   const response = await contract.query.get_count();
   console.log(response);
 
-  const transferAmount = [{"denom": "uscrt", "amount": "15000000"}] // 15 SCRT
-  const customFees = { // custom fees
+  const transferAmount = [{ denom: "uscrt", amount: "15000000" }]; // 15 SCRT
+  const customFees = {
+    // custom fees
     amount: [{ amount: "750000", denom: "uscrt" }],
     gas: "3000000",
-  }
-  const ex_response = await contract.tx.increment(
-    {account: contract_owner, transferAmount: transferAmount}
-  );
+  };
+  const ex_response = await contract.tx.increment({
+    account: contract_owner,
+    transferAmount: transferAmount,
+  });
   // const ex_response = await contract.tx.increment(
   //   {account: contract_owner, transferAmount: transferAmount, customFees: customFees}
   // );
@@ -313,29 +323,47 @@ describe("sample_project", () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
 
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+    const contract_info = await contract.instantiate(
+      { count: 102 },
+      "deploy test",
+      contract_owner
+    );
 
-    await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
+    await expect(contract.query.get_count()).to.respondWith({ count: 102 });
   });
 
   it("unauthorized reset", async () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
 
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+    const contract_info = await contract.instantiate(
+      { count: 102 },
+      "deploy test",
+      contract_owner
+    );
 
-    await expect(contract.tx.reset({account: other}, 100)).to.be.revertedWith("unauthorized");
-    await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
+    await expect(contract.tx.reset({ account: other }, 100)).to.be.revertedWith(
+      "unauthorized"
+    );
+    await expect(contract.query.get_count()).not.to.respondWith({
+      count: 1000,
+    });
   });
 
   it("increment", async () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
 
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+    const contract_info = await contract.instantiate(
+      { count: 102 },
+      "deploy test",
+      contract_owner
+    );
 
-    const ex_response = await contract.tx.increment({account: contract_owner});
-    await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
+    const ex_response = await contract.tx.increment({
+      account: contract_owner,
+    });
+    await expect(contract.query.get_count()).to.respondWith({ count: 103 });
   });
 });
 ```
@@ -452,33 +480,33 @@ The generated directory will have the following initial structure:
 ```bash
 .
 ├── contracts
-│   ├── Cargo.lock
-│   ├── Cargo.toml
-│   ├── examples
-│   │   └── schema.rs
-│   ├── src
-│   │   ├── contract.rs
-│   │   ├── lib.rs
-│   │   ├── msg.rs
-│   │   └── state.rs
-│   └── tests
-│       └── integration.rs
+│   ├── Cargo.lock
+│   ├── Cargo.toml
+│   ├── examples
+│   │   └── schema.rs
+│   ├── src
+│   │   ├── contract.rs
+│   │   ├── lib.rs
+│   │   ├── msg.rs
+│   │   └── state.rs
+│   └── tests
+│       └── integration.rs
 ├── package.json
 ├── packages
-│   └── cargo_common
-│       ├── Cargo.lock
-│       ├── Cargo.toml
-│       └── src
-│           ├── balances.rs
-│           ├── cashmap.rs
-│           ├── contract.rs
-│           ├── lib.rs
-│           ├── tokens.rs
-│           └── voting.rs
+│   └── cargo_common
+│       ├── Cargo.lock
+│       ├── Cargo.toml
+│       └── src
+│           ├── balances.rs
+│           ├── cashmap.rs
+│           ├── contract.rs
+│           ├── lib.rs
+│           ├── tokens.rs
+│           └── voting.rs
 ├── polar.config.js
 ├── README.md
 ├── scripts
-│   └── sample-script.js
+│   └── sample-script.js
 └── test
     └── sample-test.js
 
@@ -522,7 +550,7 @@ Now compiling using `polar compile` would create following structure in `artifac
 ```bash
 artifacts/
 ├── contracts
-│   └── yellow.wasm
+│   └── yellow.wasm
 └── schema
     └── yellow
         ├── count_response.json
@@ -540,12 +568,12 @@ Polar uses config file `polar.config.js` to execute tasks for the given project.
 
 **Network config**. Has following parameters:
 
-+ endpoint: Network endpoint.
-+ chainId: Network chain id.
-+ trustNode: Should be set to `true`.
-+ keyringBackend: Alias of keyring backend to be used.
-+ accounts: Array of accounts.
-+ fess: custom fees limits for each type of txns from upload, init, execute and send.
+- endpoint: Network endpoint.
+- chainId: Network chain id.
+- trustNode: Should be set to `true`.
+- keyringBackend: Alias of keyring backend to be used.
+- accounts: Array of accounts.
+- fess: custom fees limits for each type of txns from upload, init, execute and send.
 
 ```js
 networks: {
@@ -573,22 +601,24 @@ networks: {
 
 **Accounts config**. It is an array of account objects. Each account object has following parameters:
 
-+ name: Account name (alias). Does not need to match the account name anywhere else outside the project.
-+ address: Account address.
-+ mnemonic: Mnemonic for the account. Do not push this value to a public repository.
+- name: Account name (alias). Does not need to match the account name anywhere else outside the project.
+- address: Account address.
+- mnemonic: Mnemonic for the account. Do not push this value to a public repository.
 
 ```js
 const accounts = [
   {
-    name: 'account_0',
-    address: 'secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk',
-    mnemonic: 'snack cable erode art lift better october drill hospital clown erase address'
+    name: "account_0",
+    address: "secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk",
+    mnemonic:
+      "snack cable erode art lift better october drill hospital clown erase address",
   },
   {
-    name: 'account_1',
-    address: 'secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv',
-    mnemonic: 'sorry object nation also century glove small tired parrot avocado pulp purchase'
-  }
+    name: "account_1",
+    address: "secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv",
+    mnemonic:
+      "sorry object nation also century glove small tired parrot avocado pulp purchase",
+  },
 ];
 ```
 
@@ -596,10 +626,9 @@ const accounts = [
 
 ```js
 mocha: {
-  timeout: 60000
+  timeout: 60000;
 }
 ```
-
 
 ### Compiling your contracts
 
@@ -622,7 +651,7 @@ Single contract `artifacts/` directory structure:
 ```bash
 .
 ├── contracts
-│   └── sample_project.wasm
+│   └── sample_project.wasm
 └── schema
     └── sample_project
         ├── count_response.json
@@ -640,14 +669,14 @@ Multi contract `artifacts/` directory structure:
 .
 ├── contracts
 |   ├── sample_project_1.wasm
-│   └── sample_project_2.wasm
+│   └── sample_project_2.wasm
 └── schema
     ├── sample_project
-    │   ├── count_response.json
-    │   ├── handle_msg.json
-    │   ├── init_msg.json
-    │   ├── query_msg.json
-    │   └── state.json
+    │   ├── count_response.json
+    │   ├── handle_msg.json
+    │   ├── init_msg.json
+    │   ├── query_msg.json
+    │   └── state.json
     └── sample_project_1
         ├── count_response.json
         ├── handle_msg.json
@@ -662,20 +691,24 @@ Multi contract `artifacts/` directory structure:
 
 #### Sample script walkthrough
 
-Polar boilerplate code has sample script `scripts/sample-script.js` with following content: 
+Polar boilerplate code has sample script `scripts/sample-script.js` with following content:
 
 ```js
 const { Contract, getAccountByName } = require("secret-polar");
 
-async function run () {
+async function run() {
   const contract_owner = getAccountByName("account_0");
-  const contract = new Contract('sample-project');
+  const contract = new Contract("sample-project");
   await contract.parseSchema();
 
   const deploy_response = await contract.deploy(contract_owner);
   console.log(deploy_response);
 
-  const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+  const contract_info = await contract.instantiate(
+    { count: 102 },
+    "deploy test",
+    contract_owner
+  );
   console.log(contract_info);
 
   const ex_response = await contract.tx.increment(contract_owner, []);
@@ -690,61 +723,65 @@ module.exports = { default: run };
 
 Following is a line-by-line breakdown of the above script:
 
-+ Import `Contract` class and `getAccountByName` method from `secret-polar` library.
+- Import `Contract` class and `getAccountByName` method from `secret-polar` library.
 
 ```js
 const { Contract, getAccountByName } = require("secret-polar");
 ```
 
-+ `run` function definition. It should have the same signature as below with no argument. This `run` function is called by polar.
+- `run` function definition. It should have the same signature as below with no argument. This `run` function is called by polar.
 
 ```js
 async function run () {
 ```
 
-+ Fetch details of account `account_0` into `contract_owner` object.
+- Fetch details of account `account_0` into `contract_owner` object.
 
 ```js
-  const contract_owner = getAccountByName("account_0");
+const contract_owner = getAccountByName("account_0");
 ```
 
-+ Create `Contract` object for contract with name `sample-project`.
+- Create `Contract` object for contract with name `sample-project`.
 
 ```js
-  const contract = new Contract('sample-project');
+const contract = new Contract("sample-project");
 ```
 
-+ Load schema files for contract `sample-json`. Will generate error if schema files are not present, so make sure to run `polar compile` before running this.
+- Load schema files for contract `sample-json`. Will generate error if schema files are not present, so make sure to run `polar compile` before running this.
 
 ```js
-  await contract.parseSchema();
+await contract.parseSchema();
 ```
 
-+ Deploy the contract. Network is specified in the `polar run scripts/<script-name> --network <network-name>` command.
+- Deploy the contract. Network is specified in the `polar run scripts/<script-name> --network <network-name>` command.
 
 ```js
-  const deploy_response = await contract.deploy(contract_owner);
+const deploy_response = await contract.deploy(contract_owner);
 ```
 
-+ Instantiate contract instance with values `{"count": 102}` and label `"deploy test"` and account `contract_owner`.
+- Instantiate contract instance with values `{"count": 102}` and label `"deploy test"` and account `contract_owner`.
 
 ```js
-  const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+const contract_info = await contract.instantiate(
+  { count: 102 },
+  "deploy test",
+  contract_owner
+);
 ```
 
-+ Execute `increment()` transaction using account `contract_owner`. For each contract execute method, calling signature is `contract.tx.<method_name>(<signing_account>, <tokens_to_send_with_txn>, ...<method_args>);`.
+- Execute `increment()` transaction using account `contract_owner`. For each contract execute method, calling signature is `contract.tx.<method_name>(<signing_account>, <tokens_to_send_with_txn>, ...<method_args>);`.
 
 ```js
-  const ex_response = await contract.tx.increment(contract_owner, []);
+const ex_response = await contract.tx.increment(contract_owner, []);
 ```
 
-+ Fetch count value using query `get_count()`.
+- Fetch count value using query `get_count()`.
 
 ```js
-  const response = await contract.query.get_count();
+const response = await contract.query.get_count();
 ```
 
-+ Export `run` function as default for the script. Default function is called by polar runner.
+- Export `run` function as default for the script. Default function is called by polar runner.
 
 ```js
 module.exports = { default: run };
@@ -754,13 +791,13 @@ module.exports = { default: run };
 
 Polar runtime environment is used internally by polar. It is created when a polar task is executed using bash command `polar ...`. It can be accessed in REPL using variable `env`. It has following parameters:
 
-+ **config**: Has paths of config file, contract sources, artifacts, project root and test path. Other config values such as networks config and mocha timeout.
+- **config**: Has paths of config file, contract sources, artifacts, project root and test path. Other config values such as networks config and mocha timeout.
 
-+ **runtimeArgs**: Runtime metadata such as network to use etc. Network can be specified in a polar command like `polar ... --network <network-name>`.
+- **runtimeArgs**: Runtime metadata such as network to use etc. Network can be specified in a polar command like `polar ... --network <network-name>`.
 
-+ **tasks**: List of available tasks with details.
+- **tasks**: List of available tasks with details.
 
-+ **network**: Details of the network currently being used.
+- **network**: Details of the network currently being used.
 
 #### Contract class
 
@@ -805,7 +842,11 @@ Gives following response:
 Instantiate the contract.
 
 ```js
-const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+const contract_info = await contract.instantiate(
+  { count: 102 },
+  "deploy test",
+  contract_owner
+);
 ```
 
 Gives following response:
@@ -831,8 +872,10 @@ polar> contract.tx
 To list contract's query methods, print `contract.query`.
 
 ```js
-polar> contract.query
-{ get_count: [Function (anonymous)] }
+polar > contract.query;
+{
+  get_count: [Function(anonymous)];
+}
 ```
 
 #### getAccountByName
@@ -842,15 +885,17 @@ In the sample `polar.config.js` file, the accounts are defined as below:
 ```js
 const accounts = [
   {
-    name: 'account_0',
-    address: 'secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk',
-    mnemonic: 'snack cable erode art lift better october drill hospital clown erase address'
+    name: "account_0",
+    address: "secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk",
+    mnemonic:
+      "snack cable erode art lift better october drill hospital clown erase address",
   },
   {
-    name: 'account_1',
-    address: 'secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv',
-    mnemonic: 'sorry object nation also century glove small tired parrot avocado pulp purchase'
-  }
+    name: "account_1",
+    address: "secret1ddfphwwzqtkp8uhcsc53xdu24y9gks2kug45zv",
+    mnemonic:
+      "sorry object nation also century glove small tired parrot avocado pulp purchase",
+  },
 ];
 ```
 
@@ -862,25 +907,25 @@ const { getAccountByName } = require("secret-polar");
 const account_0 = getAccountByName("account_0");
 const account_1 = getAccountByName("account_1");
 
-console.log(account_0.name);  // account_0
+console.log(account_0.name); // account_0
 console.log(account_0.address); // secret1l0g5czqw7vjvd20ezlk4x7ndgyn0rx5aumr8gk
 console.log(account_0.mnemonic); // snack cable erode art lift better october drill hospital clown erase address
 ```
 
 #### createAccounts
 
-This method is used to generate new accounts and then can be filled with some balance using a testnet faucet `https://faucet.supernova.enigma.co/` (faucet are only for testnets). 
+This method is used to generate new accounts and then can be filled with some balance using a testnet faucet `https://faucet.supernova.enigma.co/` (faucet are only for testnets).
 
 ```js
 const { createAccounts } = require("secret-polar");
 
 const res = await createAccounts(1); // array of one account object
-const res = await createAccounts(3);  // array of three account objects
+const res = await createAccounts(3); // array of three account objects
 ```
 
 #### Checkpoints
 
-Checkpoints store the metadata of contract instance on the network. It stores the deploy metadata (codeId, contractCodeHash, deployTimestamp) and instantiate metadata (contractAddress, instantiateTimestamp). This comes handy when a script is run which deploys, inits and does some interactions with the contracts. 
+Checkpoints store the metadata of contract instance on the network. It stores the deploy metadata (codeId, contractCodeHash, deployTimestamp) and instantiate metadata (contractAddress, instantiateTimestamp). This comes handy when a script is run which deploys, inits and does some interactions with the contracts.
 
 Suppose the script fails after init step and now script is to be rerun after some fixes in the contract, here one does not want for the contract to be deployed and instantiated again, so polar picks up the saved metadata from checkpoints file and directly skips to part after init and uses the previously deployed instance and user does not have to pay the extra gas and wait extra time to deploy, init the contract again. Same happens when there is error before init and rerun skips deploy and directly executes init step.
 
@@ -922,36 +967,52 @@ describe("sample_project", () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
 
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+    const contract_info = await contract.instantiate(
+      { count: 102 },
+      "deploy test",
+      contract_owner
+    );
 
-    await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
+    await expect(contract.query.get_count()).to.respondWith({ count: 102 });
   });
 
   it("unauthorized reset", async () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
 
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+    const contract_info = await contract.instantiate(
+      { count: 102 },
+      "deploy test",
+      contract_owner
+    );
 
-    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
-    await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
+    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith(
+      "unauthorized"
+    );
+    await expect(contract.query.get_count()).not.to.respondWith({
+      count: 1000,
+    });
   });
 
   it("increment", async () => {
     const { contract_owner, other, contract } = await setup();
     const deploy_response = await contract.deploy(contract_owner);
 
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+    const contract_info = await contract.instantiate(
+      { count: 102 },
+      "deploy test",
+      contract_owner
+    );
 
     const ex_response = await contract.tx.increment(contract_owner, []);
-    await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
+    await expect(contract.query.get_count()).to.respondWith({ count: 103 });
   });
 });
 ```
 
 Following is a breakdown of the above script:
 
-+ Import `expect` and `use` from chai, `Contract`, `getAccountByName` and `polarChai` from secret-polar and add polar asserts to chai using `use(polarChai)`.
+- Import `expect` and `use` from chai, `Contract`, `getAccountByName` and `polarChai` from secret-polar and add polar asserts to chai using `use(polarChai)`.
 
 ```js
 const { expect, use } = require("chai");
@@ -960,58 +1021,72 @@ const { Contract, getAccountByName, polarChai } = require("secret-polar");
 use(polarChai);
 ```
 
-+ `setup()` method does the initial common steps for each test, such as creating `Account` objects, creating `Contract` objects and parsing contract's schema files.
+- `setup()` method does the initial common steps for each test, such as creating `Account` objects, creating `Contract` objects and parsing contract's schema files.
 
 ```js
-  async function setup() {
-    const contract_owner = getAccountByName("account_1");
-    const other = getAccountByName("account_0");
-    const contract = new Contract("sample-project");
-    await contract.parseSchema();
+async function setup() {
+  const contract_owner = getAccountByName("account_1");
+  const other = getAccountByName("account_0");
+  const contract = new Contract("sample-project");
+  await contract.parseSchema();
 
-    return { contract_owner, other, contract };
-  }
+  return { contract_owner, other, contract };
+}
 ```
 
-+ First test: Deploys, inits the contract and tests query count value.
+- First test: Deploys, inits the contract and tests query count value.
 
 ```js
-  it("deploy and init", async () => {
-    const { contract_owner, other, contract } = await setup();
-    const deploy_response = await contract.deploy(contract_owner);
+it("deploy and init", async () => {
+  const { contract_owner, other, contract } = await setup();
+  const deploy_response = await contract.deploy(contract_owner);
 
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+  const contract_info = await contract.instantiate(
+    { count: 102 },
+    "deploy test",
+    contract_owner
+  );
 
-    await expect(contract.query.get_count()).to.respondWith({ 'count': 102 });
-  });
+  await expect(contract.query.get_count()).to.respondWith({ count: 102 });
+});
 ```
 
-+ Second test: Deploys, inits the contract and tests query unauthorized execution of `reset()` transaction.
+- Second test: Deploys, inits the contract and tests query unauthorized execution of `reset()` transaction.
 
 ```js
-  it("unauthorized reset", async () => {
-    const { contract_owner, other, contract } = await setup();
-    const deploy_response = await contract.deploy(contract_owner);
-    
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
-    
-    await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith("unauthorized");
-    await expect(contract.query.get_count()).not.to.respondWith({ 'count': 1000 });
-  });
+it("unauthorized reset", async () => {
+  const { contract_owner, other, contract } = await setup();
+  const deploy_response = await contract.deploy(contract_owner);
+
+  const contract_info = await contract.instantiate(
+    { count: 102 },
+    "deploy test",
+    contract_owner
+  );
+
+  await expect(contract.tx.reset(other, [], 100)).to.be.revertedWith(
+    "unauthorized"
+  );
+  await expect(contract.query.get_count()).not.to.respondWith({ count: 1000 });
+});
 ```
 
-+ Third test: Deploys, inits the contract and tests `increment` transaction.
+- Third test: Deploys, inits the contract and tests `increment` transaction.
 
 ```js
-  it("increment", async () => {
-    const { contract_owner, other, contract } = await setup();
-    const deploy_response = await contract.deploy(contract_owner);
+it("increment", async () => {
+  const { contract_owner, other, contract } = await setup();
+  const deploy_response = await contract.deploy(contract_owner);
 
-    const contract_info = await contract.instantiate({"count": 102}, "deploy test", contract_owner);
+  const contract_info = await contract.instantiate(
+    { count: 102 },
+    "deploy test",
+    contract_owner
+  );
 
-    const ex_response = await contract.tx.increment(contract_owner, []);
-    await expect(contract.query.get_count()).to.respondWith({ 'count': 103 });
-  });
+  const ex_response = await contract.tx.increment(contract_owner, []);
+  await expect(contract.query.get_count()).to.respondWith({ count: 103 });
+});
 ```
 
 **Note:** It is fine to have `deploy`, `instantiate` in each test as they are not executed multiple times for a given contract. Moving these steps in the `setup()` method is fine too.
@@ -1025,7 +1100,6 @@ use(polarChai);
 ### Error codes
 
 ## API -->
-
 
 ### Using localnet with polar
 
@@ -1048,7 +1122,7 @@ LocalSecret comes with a few acocunts with pre-seeded SCRT for you to use. You c
 
 To read the full LocalSecret docs go to: https://docs.scrt.network/dev/LocalSecret.html
 
-The `localsecret` docker container can be stopped by CTRL+C. At this point you're running a local SecretNetwork full-node. 
+The `localsecret` docker container can be stopped by CTRL+C. At this point you're running a local SecretNetwork full-node.
 
 #### Checking the node info
 
