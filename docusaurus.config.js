@@ -7,17 +7,18 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Polar Documentation",
-  tagline: "Dinosaurs are cool",
+  tagline:
+    "Development Environment to compile, deploy, test, run scrt contracts on different networks.",
   url: "https://your-docusaurus-test-site.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/snow-ico.png",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "facebook", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
+  organizationName: "Arufa Research", // Usually your GitHub org/user name.
+  projectName: "Polar", // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -60,7 +61,7 @@ const config = {
         title: "Polar Docs",
         logo: {
           alt: "My Site Logo",
-          src: "img/snow.svg",
+          src: "img/snow.jpg",
         },
         items: [
           // {
@@ -85,7 +86,7 @@ const config = {
             items: [
               {
                 label: "Tutorial",
-                to: "/docs/introduction",
+                to: "/docs/intro",
               },
             ],
           },
@@ -93,16 +94,8 @@ const config = {
             title: "Community",
             items: [
               {
-                label: "Stack Overflow",
-                href: "https://stackoverflow.com/questions/tagged/docusaurus",
-              },
-              {
-                label: "Discord",
-                href: "https://discordapp.com/invite/docusaurus",
-              },
-              {
                 label: "Twitter",
-                href: "https://twitter.com/docusaurus",
+                href: "https://mobile.twitter.com/arufaresearch",
               },
             ],
           },
@@ -111,16 +104,16 @@ const config = {
             items: [
               {
                 label: "Blog",
-                to: "/blog",
+                to: "/docs/intro",
               },
               {
                 label: "GitHub",
-                href: "https://github.com/facebook/docusaurus",
+                href: "https://github.com/arufa-research/polar",
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © 2022 Arufa Research, Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
